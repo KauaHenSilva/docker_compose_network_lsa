@@ -1,0 +1,40 @@
+x-router-base: &router_base
+  build:
+    context: router
+    dockerfile: dockerfile  # Confira se é "Dockerfile" com D maiúsculo
+
+x-host-base: &host_base
+  build:
+    context: host
+    dockerfile: dockerfile
+
+services:
+  router1:
+    <<: *router_base
+    networks:
+      rede_isolada:
+        ipv4_address: 172.20.0.2  # Novo gateway
+
+  host1a:
+    <<: *host_base
+    depends_on:
+      - router1
+    networks:
+      rede_isolada:
+        ipv4_address: 172.20.0.10
+
+  host1b:
+    <<: *host_base
+    depends_on:
+      - router1
+    networks:
+      rede_isolada:
+        ipv4_address: 172.20.0.11
+
+networks:
+  rede_isolada:
+    driver: bridge
+    internal: true 
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
