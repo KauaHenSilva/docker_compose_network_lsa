@@ -1,6 +1,8 @@
-FROM python:3.13-slim 
+FROM ubuntu:latest
 
 WORKDIR /app
+RUN apt-get update && apt-get install -y python3 python3-pip iproute2 iputils-ping
+
 COPY . .
 
-CMD ["python", "host.py"]
+CMD ["python3", "router.py"]
