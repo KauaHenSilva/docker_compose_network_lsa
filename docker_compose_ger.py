@@ -49,9 +49,14 @@ def generate_docker_compose(num_subnets):
                 'dockerfile': 'Dockerfile'
             },
             'environment': [
-                f"router_links={','.join(links)}"
+                f"router_links={','.join(links)}",
+                f"my_ip={networks[f'subnet_{i}']['ipv4_address']}",
+                f"my_name={router_name}"
             ],
-            'networks': networks
+            'networks': networks,
+            'cap_add': [
+                'NET_ADMIN'
+            ]
         }
 
     # # Gerar hosts para cada subrede
