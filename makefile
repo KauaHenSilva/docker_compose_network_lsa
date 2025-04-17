@@ -1,4 +1,3 @@
-
 ger:
 	@python3 docker_compose_ger.py
 
@@ -14,9 +13,10 @@ clear:
 	@docker network prune -f
 
 show-tables:
-	@./scripts_test/show_tables.sh
+	@python3 scripts_test/show_tables.py
 
 test-connectivity:
-	@./scripts_test/test_connectivity.sh
+	@python3 scripts_test/test_connectivity.py
+
 
 

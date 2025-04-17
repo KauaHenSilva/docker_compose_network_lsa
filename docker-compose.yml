@@ -54,12 +54,207 @@ services:
       context: ./router
       dockerfile: Dockerfile
     environment:
-    - router_links=router4
+    - router_links=router4,router6
     networks:
       subnet_5:
         ipv4_address: 172.20.5.3
       subnet_4:
         ipv4_address: 172.20.4.2
+      subnet_6:
+        ipv4_address: 172.20.6.4
+  router6:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router5,router7
+    networks:
+      subnet_6:
+        ipv4_address: 172.20.6.3
+      subnet_5:
+        ipv4_address: 172.20.5.2
+      subnet_7:
+        ipv4_address: 172.20.7.4
+  router7:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router6,router8
+    networks:
+      subnet_7:
+        ipv4_address: 172.20.7.3
+      subnet_6:
+        ipv4_address: 172.20.6.2
+      subnet_8:
+        ipv4_address: 172.20.8.4
+  router8:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router7,router9
+    networks:
+      subnet_8:
+        ipv4_address: 172.20.8.3
+      subnet_7:
+        ipv4_address: 172.20.7.2
+      subnet_9:
+        ipv4_address: 172.20.9.4
+  router9:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router8,router10
+    networks:
+      subnet_9:
+        ipv4_address: 172.20.9.3
+      subnet_8:
+        ipv4_address: 172.20.8.2
+      subnet_10:
+        ipv4_address: 172.20.10.4
+  router10:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router9,router11
+    networks:
+      subnet_10:
+        ipv4_address: 172.20.10.3
+      subnet_9:
+        ipv4_address: 172.20.9.2
+      subnet_11:
+        ipv4_address: 172.20.11.4
+  router11:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router10,router12
+    networks:
+      subnet_11:
+        ipv4_address: 172.20.11.3
+      subnet_10:
+        ipv4_address: 172.20.10.2
+      subnet_12:
+        ipv4_address: 172.20.12.4
+  router12:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router11,router13
+    networks:
+      subnet_12:
+        ipv4_address: 172.20.12.3
+      subnet_11:
+        ipv4_address: 172.20.11.2
+      subnet_13:
+        ipv4_address: 172.20.13.4
+  router13:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router12,router14
+    networks:
+      subnet_13:
+        ipv4_address: 172.20.13.3
+      subnet_12:
+        ipv4_address: 172.20.12.2
+      subnet_14:
+        ipv4_address: 172.20.14.4
+  router14:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router13,router15
+    networks:
+      subnet_14:
+        ipv4_address: 172.20.14.3
+      subnet_13:
+        ipv4_address: 172.20.13.2
+      subnet_15:
+        ipv4_address: 172.20.15.4
+  router15:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router14,router16
+    networks:
+      subnet_15:
+        ipv4_address: 172.20.15.3
+      subnet_14:
+        ipv4_address: 172.20.14.2
+      subnet_16:
+        ipv4_address: 172.20.16.4
+  router16:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router15,router17
+    networks:
+      subnet_16:
+        ipv4_address: 172.20.16.3
+      subnet_15:
+        ipv4_address: 172.20.15.2
+      subnet_17:
+        ipv4_address: 172.20.17.4
+  router17:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router16,router18
+    networks:
+      subnet_17:
+        ipv4_address: 172.20.17.3
+      subnet_16:
+        ipv4_address: 172.20.16.2
+      subnet_18:
+        ipv4_address: 172.20.18.4
+  router18:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router17,router19
+    networks:
+      subnet_18:
+        ipv4_address: 172.20.18.3
+      subnet_17:
+        ipv4_address: 172.20.17.2
+      subnet_19:
+        ipv4_address: 172.20.19.4
+  router19:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router18,router20
+    networks:
+      subnet_19:
+        ipv4_address: 172.20.19.3
+      subnet_18:
+        ipv4_address: 172.20.18.2
+      subnet_20:
+        ipv4_address: 172.20.20.4
+  router20:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    environment:
+    - router_links=router19
+    networks:
+      subnet_20:
+        ipv4_address: 172.20.20.3
+      subnet_19:
+        ipv4_address: 172.20.19.2
 networks:
   subnet_1:
     driver: bridge
@@ -86,3 +281,78 @@ networks:
     ipam:
       config:
       - subnet: 172.20.5.0/24
+  subnet_6:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.6.0/24
+  subnet_7:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.7.0/24
+  subnet_8:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.8.0/24
+  subnet_9:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.9.0/24
+  subnet_10:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.10.0/24
+  subnet_11:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.11.0/24
+  subnet_12:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.12.0/24
+  subnet_13:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.13.0/24
+  subnet_14:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.14.0/24
+  subnet_15:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.15.0/24
+  subnet_16:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.16.0/24
+  subnet_17:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.17.0/24
+  subnet_18:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.18.0/24
+  subnet_19:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.19.0/24
+  subnet_20:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.20.0/24
