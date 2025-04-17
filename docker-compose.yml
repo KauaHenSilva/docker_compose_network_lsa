@@ -54,77 +54,12 @@ services:
       context: ./router
       dockerfile: Dockerfile
     environment:
-    - router_links=router4,router6
+    - router_links=router4
     networks:
       subnet_5:
         ipv4_address: 172.20.5.3
       subnet_4:
         ipv4_address: 172.20.4.2
-      subnet_6:
-        ipv4_address: 172.20.6.4
-  router6:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - router_links=router5,router7
-    networks:
-      subnet_6:
-        ipv4_address: 172.20.6.3
-      subnet_5:
-        ipv4_address: 172.20.5.2
-      subnet_7:
-        ipv4_address: 172.20.7.4
-  router7:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - router_links=router6,router8
-    networks:
-      subnet_7:
-        ipv4_address: 172.20.7.3
-      subnet_6:
-        ipv4_address: 172.20.6.2
-      subnet_8:
-        ipv4_address: 172.20.8.4
-  router8:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - router_links=router7,router9
-    networks:
-      subnet_8:
-        ipv4_address: 172.20.8.3
-      subnet_7:
-        ipv4_address: 172.20.7.2
-      subnet_9:
-        ipv4_address: 172.20.9.4
-  router9:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - router_links=router8,router10
-    networks:
-      subnet_9:
-        ipv4_address: 172.20.9.3
-      subnet_8:
-        ipv4_address: 172.20.8.2
-      subnet_10:
-        ipv4_address: 172.20.10.4
-  router10:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - router_links=router9
-    networks:
-      subnet_10:
-        ipv4_address: 172.20.10.3
-      subnet_9:
-        ipv4_address: 172.20.9.2
 networks:
   subnet_1:
     driver: bridge
@@ -151,28 +86,3 @@ networks:
     ipam:
       config:
       - subnet: 172.20.5.0/24
-  subnet_6:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.6.0/24
-  subnet_7:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.7.0/24
-  subnet_8:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.8.0/24
-  subnet_9:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.9.0/24
-  subnet_10:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.10.0/24

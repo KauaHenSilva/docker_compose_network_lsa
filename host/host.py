@@ -7,4 +7,5 @@ ip_address = socket.gethostbyname(hostname)
 
 print(f"Hostname: {hostname} / IP Address: {ip_address}")
 
-
+while True:
+  time.sleep(1)

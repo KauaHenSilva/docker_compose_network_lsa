@@ -15,3 +15,6 @@ for link in router_links.split(','):
     print(f"Router link: {link} -> {socket.gethostbyname(link)}", flush=True)
   except socket.gaierror:
     print(f"Router link: {link} -> Not found", flush=True)
+
+while True:
+  time.sleep(1)
