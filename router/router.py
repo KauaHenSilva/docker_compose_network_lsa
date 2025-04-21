@@ -12,6 +12,9 @@ DEFAULT_LSA_PORT = 5000
 HEALTH_CHECK_INTERVAL = 2  # segundos
 HEALTH_CHECK_TIMEOUT = 1   # segundos
 
+LSA_UPDATE_INTERVAL = 30  # segundos (periodic update interval)
+ROUTE_UPDATE_INTERVAL = 60  # segundos (periodic forced update)
+
 class Vizinho:
     """Representa um roteador vizinho na topologia de rede."""
     
@@ -142,9 +145,18 @@ class Router:
         self.tabela_rotas = TabelaRotas()
         self.seq = 0
         
-        # Cache de rotas adicionadas
         self.rotas_atuais = {}  # formato: {rede_destino: (next_hop_ip, interface)}
-    
+        
+        self.lsa_cache = {}  # Cache para LSAs processados
+        self.ultimo_lsa_enviado = None  # Último LSA enviado
+        self.ultima_hash_tabela = None  # Hash da última tabela de rotas
+        
+        self.ultimo_envio_periodico = 0  # Timestamp do último envio periódico
+        self.ultimo_recalculo_periodico = 0  # Timestamp do último recálculo periódico
+        
+        self.precisa_recalcular = True  # Flag para controle de recálculo
+        self.mudanca_detectada = False  # Flag para controle de envio
+
     def log(self, message: str) -> None:
         """Registra mensagens de log com identificador do roteador."""
         print(f"[{self.hostname}] {message}", flush=True)
@@ -193,6 +205,7 @@ class Router:
 
     def _health_check_thread(self):
         """Thread que monitora a saúde dos vizinhos"""
+        ultimo_estado = set()
         while True:
             vizinhos_verificados = set()
             
@@ -201,14 +214,20 @@ class Router:
                 
                 if esta_ativo:
                     vizinhos_verificados.add(hostname)
-                    if hostname not in self.vizinhos_ativos:
-                        self.log(f"Vizinho {hostname} está ativo novamente")
+                    if hostname not in ultimo_estado:
+                        self.mudanca_detectada = True
+                        self.precisa_recalcular = True
+                        self.log(f"Vizinho {hostname} está ativo")
                 else:
-                    if hostname in self.vizinhos_ativos:
+                    if hostname in ultimo_estado:
+                        self.mudanca_detectada = True
+                        self.precisa_recalcular = True
                         self.log(f"Vizinho {hostname} não está respondendo")
             
-            # Atualiza conjunto de vizinhos ativos
-            self.vizinhos_ativos = vizinhos_verificados
+            if ultimo_estado != vizinhos_verificados:
+                self.vizinhos_ativos = vizinhos_verificados
+                ultimo_estado = vizinhos_verificados.copy()
+            
             time.sleep(HEALTH_CHECK_INTERVAL)
 
     def dijkstra(self, origem: str) -> TabelaRotas:
@@ -300,46 +319,63 @@ class Router:
         return caminho
 
     def receber_lsa(self) -> None:
-        """Thread para receber LSAs de outros roteadores."""
+        """Thread otimizada para receber LSAs."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(("0.0.0.0", self.porta_lsa))
+        processados = {}  # Cache de LSAs já processados
         
         while True:
             try:
                 dados, addr = sock.recvfrom(4096)
                 dados_dict = json.loads(dados.decode())
                 
-                # Verifica se é uma mensagem de healthcheck
+                # Fast path para healthcheck
                 if dados_dict.get("type") == "health_check":
                     resposta = json.dumps({
-                        "type": "health_response",
-                        "from": self.hostname,
-                        "timestamp": time.time()
+                        "type": "health_response", 
+                        "from": self.hostname
                     }).encode()
                     sock.sendto(resposta, addr)
                     continue
                 
-                # Processa LSA normalmente
-                self.log(f"Recebendo LSA de {addr[0]}: {dados_dict['id']} (seq={dados_dict['seq']})")
+                # Identifica LSA de forma única
+                lsa_id = dados_dict.get('id', '')
+                lsa_seq = dados_dict.get('seq', 0)
+                cache_key = f"{lsa_id}_{lsa_seq}"
                 
+                # Evita processamento duplicado
+                if cache_key in processados:
+                    continue
+                    
+                processados[cache_key] = True
+                # Limita o cache para evitar crescimento infinito
+                if len(processados) > 1000:
+                    processados.clear()
+                
+                # Processa o LSA
                 lsa = LSA.from_dict(dados_dict)
-                
-                # Adiciona o LSA à base de dados e encaminha se for novo
                 if self.lsdb.adicionar_lsa(lsa):
-                    # Encaminha o LSA para outros vizinhos
+                    self.precisa_recalcular = True
+                    # Encaminha apenas para vizinhos que não o enviaram
                     for hostname, vizinho in self.vizinhos.items():
-                        if vizinho.ip != addr[0]:
+                        if vizinho.ip != addr[0] and hostname in self.vizinhos_ativos:
                             sock.sendto(dados, (vizinho.ip, self.porta_lsa))
-                            self.log(f"Encaminhando LSA para {hostname} ({vizinho.ip})")
             except Exception as e:
                 self.log(f"Erro ao receber LSA: {e}")
 
     def enviar_lsa(self) -> None:
-        """Thread para enviar LSAs periodicamente."""
+        """Thread para enviar LSAs apenas quando necessário ou periodicamente."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         
         while True:
             try:
+                tempo_atual = time.time()
+                envio_periodico = tempo_atual - self.ultimo_envio_periodico > LSA_UPDATE_INTERVAL
+                
+                if not self.mudanca_detectada and not envio_periodico:
+                    time.sleep(1)  # Verificação mais frequente
+                    continue
+
                 # Filtra apenas vizinhos ativos
                 vizinhos_ativos = {
                     hostname: vizinho 
@@ -347,32 +383,37 @@ class Router:
                     if hostname in self.vizinhos_ativos
                 }
                 
+                # Gera hash dos vizinhos para comparação
+                vizinhos_hash = frozenset(vizinhos_ativos.keys())
+                
+                # Só envia se houver mudança ou for hora do envio periódico
                 if not vizinhos_ativos:
-                    self.log("Nenhum vizinho ativo no momento")
-                    time.sleep(TIME_SLEEP)
+                    self.mudanca_detectada = False
+                    time.sleep(1)
                     continue
-
+                    
+                if vizinhos_hash == self.ultimo_lsa_enviado and not envio_periodico:
+                    self.mudanca_detectada = False
+                    time.sleep(1)
+                    continue
+                
                 self.seq += 1
+                motivo = "periódico" if envio_periodico else "mudança detectada"
+                self.log(f"Enviando LSA ({motivo}, seq={self.seq})")
                 
-                # Cria um novo LSA com as informações atuais
-                lsa = LSA(
-                    id=self.hostname,
-                    ip=self.ip_address,
-                    vizinhos=vizinhos_ativos,
-                    seq=self.seq
-                )
-                
-                # Converte para dicionário e depois para JSON
+                # Cria e envia o LSA
+                lsa = LSA(id=self.hostname, ip=self.ip_address, 
+                          vizinhos=vizinhos_ativos, seq=self.seq)
                 mensagem = json.dumps(lsa.to_dict()).encode()
                 
-                self.log(f"Enviando LSA (seq={self.seq}) para {len(vizinhos_ativos)} vizinhos")
-                
-                # Envia para todos os vizinhos ativos
-                for _, vizinho in vizinhos_ativos.items():
+                for hostname, vizinho in vizinhos_ativos.items():
                     sock.sendto(mensagem, (vizinho.ip, self.porta_lsa))
                 
-                # Adiciona o próprio LSA à base de dados
+                # Atualiza estado e cache
                 self.lsdb.adicionar_lsa(lsa)
+                self.ultimo_lsa_enviado = vizinhos_hash
+                self.ultimo_envio_periodico = tempo_atual
+                self.mudanca_detectada = False
                 
                 time.sleep(TIME_SLEEP)
             except Exception as e:
@@ -380,23 +421,42 @@ class Router:
                 time.sleep(TIME_SLEEP)
 
     def atualizar_tabela(self) -> None:
-        """Thread para atualizar a tabela de rotas periodicamente."""
+        """Thread para atualizar a tabela de rotas apenas quando necessário ou periodicamente."""
         while True:
             try:
-                if self.lsdb:
-                    # Calcula as novas rotas com o algoritmo de Dijkstra
-                    self.tabela_rotas = self.dijkstra(self.hostname)
-                    
-                    if self.tabela_rotas:
-                        self.log(f"Nova tabela de rotas ({len(self.tabela_rotas)} entradas):")
-                        for destino, proximo_salto in self.tabela_rotas.items():
-                            self.log(f"  {destino} via {proximo_salto}")
-                        self.atualizar_tabela_rotas_sistema()
-                    else:
-                        self.log("Nenhuma rota calculada.")
-                else:
-                    self.log("LSDB vazia, aguardando LSAs...")
+                tempo_atual = time.time()
+                recalculo_periodico = tempo_atual - self.ultimo_recalculo_periodico > ROUTE_UPDATE_INTERVAL
                 
+                if not self.precisa_recalcular and not recalculo_periodico:
+                    time.sleep(1)
+                    continue
+                
+                if not self.lsdb:
+                    self.log("LSDB vazia, aguardando LSAs...")
+                    time.sleep(TIME_SLEEP)
+                    continue
+                    
+                self.log(f"{'Recálculo periódico' if recalculo_periodico else 'Recálculo por mudança'} de rotas")
+                
+                # Calcula novas rotas
+                nova_tabela = self.dijkstra(self.hostname)
+                nova_hash = hash(frozenset((k, v) for k, v in nova_tabela.rotas.items()))
+                
+                # Verifica se houve mudança ou é atualizaçäo periódica
+                if nova_hash != self.ultima_hash_tabela or recalculo_periodico:
+                    self.tabela_rotas = nova_tabela
+                    self.log(f"Tabela atualizada com {len(nova_tabela)} rotas")
+                    
+                    # Atualiza tabela do sistema apenas se houve mudança real
+                    if nova_hash != self.ultima_hash_tabela:
+                        self.atualizar_tabela_rotas_sistema()
+                        
+                    self.ultima_hash_tabela = nova_hash
+                else:
+                    self.log("Nenhuma mudança nas rotas")
+                
+                self.ultimo_recalculo_periodico = tempo_atual
+                self.precisa_recalcular = False
                 time.sleep(TIME_SLEEP)
             except Exception as e:
                 self.log(f"Erro ao atualizar tabela: {e}")
@@ -503,14 +563,12 @@ class Router:
                 else:
                     self.log(f"Próximo salto {proximo_salto} não é vizinho direto")
             
-            # Agora, comparando com as rotas atuais, adiciona/remove conforme necessário
             for rede, (next_hop, interface) in novas_rotas.items():
                 if rede not in self.rotas_atuais or self.rotas_atuais[rede] != (next_hop, interface):
                     self.log(f"Adicionando rota: {rede} via {next_hop} dev {interface}")
                     self._adicionar_rota_sistema(rede, next_hop, interface)
                     self.rotas_atuais[rede] = (next_hop, interface)
             
-            # Rotas a serem removidas (estão em rotas_atuais mas não em novas_rotas)
             for rede in list(self.rotas_atuais.keys()):
                 if rede not in novas_rotas:
                     next_hop, interface = self.rotas_atuais[rede]
@@ -526,10 +584,6 @@ class Router:
     def _adicionar_rota_sistema(self, subnet_destino: str, next_hop_ip: str, dev_interface: str) -> None:
         """Adiciona uma rota no sistema operacional."""
         try:
-            # Remover rota existente para evitar erros
-            subprocess.run(f"ip route del {subnet_destino} 2>/dev/null || true", shell=True)
-            
-            # Adicionar a nova rota COM o parâmetro dev
             cmd_add = f"ip route add {subnet_destino} via {next_hop_ip} dev {dev_interface}"
             self.log(f"Executando: {cmd_add}")
             
@@ -558,14 +612,12 @@ class Router:
         self.log(f"IP Address: {self.ip_address}")
         self.log(f"Vizinhos: {[v.hostname for v in self.vizinhos.values()]}")
         
-        # Listar rotas atuais para debug
         try:
             routes_result = subprocess.run(["ip", "route", "list"], stdout=subprocess.PIPE, text=True)
             self.log(f"Rotas atuais antes de iniciar:\n{routes_result.stdout}")
         except Exception as e:
             self.log(f"ERRO ao listar rotas atuais: {e}")
         
-        # Cria e inicia as threads
         threads = [
             threading.Thread(target=self.receber_lsa, name="RecvLSA"),
             threading.Thread(target=self.enviar_lsa, name="SendLSA"),
@@ -577,8 +629,7 @@ class Router:
             thread.daemon = True
             thread.start()
             self.log(f"Thread {thread.name} iniciada")
-        
-        # Mantém o programa rodando
+
         try:
             while True:
                 time.sleep(1)
