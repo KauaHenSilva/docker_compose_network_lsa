@@ -9,6 +9,8 @@ from typing import Dict, Any, Set, Tuple, List, Optional
 # Constantes globais
 TIME_SLEEP = 5
 DEFAULT_LSA_PORT = 5000
+HEALTH_CHECK_INTERVAL = 2  # segundos
+HEALTH_CHECK_TIMEOUT = 1   # segundos
 
 class Vizinho:
     """Representa um roteador vizinho na topologia de rede."""
@@ -133,6 +135,7 @@ class Router:
         self.hostname = os.environ.get('my_name', '')
         self.ip_address = os.environ.get('my_ip', '')
         self.vizinhos = self._get_vizinhos()
+        self.vizinhos_ativos = set()  # Conjunto de hostnames dos vizinhos ativos
         
         self.porta_lsa = DEFAULT_LSA_PORT
         self.lsdb = LSDB()
@@ -159,6 +162,54 @@ class Router:
             except socket.gaierror:
                 self.log(f"Não foi possível resolver o hostname: {hostname}")
         return vizinhos
+
+    def _verificar_saude_vizinho(self, hostname: str, ip: str) -> bool:
+        """Verifica se um vizinho está respondendo"""
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.settimeout(HEALTH_CHECK_TIMEOUT)
+            
+            # Envia mensagem de healthcheck
+            mensagem = json.dumps({
+                "type": "health_check",
+                "from": self.hostname,
+                "timestamp": time.time()
+            }).encode()
+            
+            sock.sendto(mensagem, (ip, self.porta_lsa))
+            
+            # Aguarda resposta
+            try:
+                data, addr = sock.recvfrom(1024)
+                response = json.loads(data.decode())
+                return response.get("type") == "health_response"
+            except socket.timeout:
+                return False
+        except Exception as e:
+            self.log(f"Erro ao verificar saúde de {hostname}: {e}")
+            return False
+        finally:
+            sock.close()
+
+    def _health_check_thread(self):
+        """Thread que monitora a saúde dos vizinhos"""
+        while True:
+            vizinhos_verificados = set()
+            
+            for hostname, vizinho in self.vizinhos.items():
+                esta_ativo = self._verificar_saude_vizinho(hostname, vizinho.ip)
+                
+                if esta_ativo:
+                    vizinhos_verificados.add(hostname)
+                    if hostname not in self.vizinhos_ativos:
+                        self.log(f"Vizinho {hostname} está ativo novamente")
+                else:
+                    if hostname in self.vizinhos_ativos:
+                        self.log(f"Vizinho {hostname} não está respondendo")
+            
+            # Atualiza conjunto de vizinhos ativos
+            self.vizinhos_ativos = vizinhos_verificados
+            time.sleep(HEALTH_CHECK_INTERVAL)
 
     def dijkstra(self, origem: str) -> TabelaRotas:
         """Implementação do algoritmo de Dijkstra para calcular o caminho mais curto."""
@@ -256,10 +307,22 @@ class Router:
         while True:
             try:
                 dados, addr = sock.recvfrom(4096)
-                lsa_dict = json.loads(dados.decode())
-                self.log(f"Recebendo LSA de {addr[0]}: {lsa_dict['id']} (seq={lsa_dict['seq']})")
+                dados_dict = json.loads(dados.decode())
                 
-                lsa = LSA.from_dict(lsa_dict)
+                # Verifica se é uma mensagem de healthcheck
+                if dados_dict.get("type") == "health_check":
+                    resposta = json.dumps({
+                        "type": "health_response",
+                        "from": self.hostname,
+                        "timestamp": time.time()
+                    }).encode()
+                    sock.sendto(resposta, addr)
+                    continue
+                
+                # Processa LSA normalmente
+                self.log(f"Recebendo LSA de {addr[0]}: {dados_dict['id']} (seq={dados_dict['seq']})")
+                
+                lsa = LSA.from_dict(dados_dict)
                 
                 # Adiciona o LSA à base de dados e encaminha se for novo
                 if self.lsdb.adicionar_lsa(lsa):
@@ -277,23 +340,35 @@ class Router:
         
         while True:
             try:
+                # Filtra apenas vizinhos ativos
+                vizinhos_ativos = {
+                    hostname: vizinho 
+                    for hostname, vizinho in self.vizinhos.items()
+                    if hostname in self.vizinhos_ativos
+                }
+                
+                if not vizinhos_ativos:
+                    self.log("Nenhum vizinho ativo no momento")
+                    time.sleep(TIME_SLEEP)
+                    continue
+
                 self.seq += 1
                 
                 # Cria um novo LSA com as informações atuais
                 lsa = LSA(
                     id=self.hostname,
                     ip=self.ip_address,
-                    vizinhos=self.vizinhos,
+                    vizinhos=vizinhos_ativos,
                     seq=self.seq
                 )
                 
                 # Converte para dicionário e depois para JSON
                 mensagem = json.dumps(lsa.to_dict()).encode()
                 
-                self.log(f"Enviando LSA (seq={self.seq}) para {len(self.vizinhos)} vizinhos")
+                self.log(f"Enviando LSA (seq={self.seq}) para {len(vizinhos_ativos)} vizinhos")
                 
-                # Envia para todos os vizinhos
-                for _, vizinho in self.vizinhos.items():
+                # Envia para todos os vizinhos ativos
+                for _, vizinho in vizinhos_ativos.items():
                     sock.sendto(mensagem, (vizinho.ip, self.porta_lsa))
                 
                 # Adiciona o próprio LSA à base de dados
@@ -494,7 +569,8 @@ class Router:
         threads = [
             threading.Thread(target=self.receber_lsa, name="RecvLSA"),
             threading.Thread(target=self.enviar_lsa, name="SendLSA"),
-            threading.Thread(target=self.atualizar_tabela, name="UpdateTable")
+            threading.Thread(target=self.atualizar_tabela, name="UpdateTable"),
+            threading.Thread(target=self._health_check_thread, name="HealthCheck")
         ]
         
         for thread in threads:
