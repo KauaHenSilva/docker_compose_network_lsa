@@ -60,21 +60,21 @@ def generate_docker_compose(num_subnets):
         }
 
     # # Gerar hosts para cada subrede
-    for i in range(1, num_subnets + 1):
-        for host, ip_suffix in [('a', 10), ('b', 11)]:
-            host_name = f"host{i}{host}"
-            docker_compose['services'][host_name] = {
-                'build': {
-                    'context': './host',
-                    'dockerfile': 'Dockerfile'
-                },
-                'networks': {
-                    f"subnet_{i}": {
-                        'ipv4_address': f'172.20.{i}.{ip_suffix}'
-                    }
-                },
-                'depends_on': [f'router{i}']
-            }
+    # for i in range(1, num_subnets + 1):
+    #     for host, ip_suffix in [('a', 10), ('b', 11)]:
+    #         host_name = f"host{i}{host}"
+    #         docker_compose['services'][host_name] = {
+    #             'build': {
+    #                 'context': './host',
+    #                 'dockerfile': 'Dockerfile'
+    #             },
+    #             'networks': {
+    #                 f"subnet_{i}": {
+    #                     'ipv4_address': f'172.20.{i}.{ip_suffix}'
+    #                 }
+    #             },
+    #             'depends_on': [f'router{i}']
+    #         }
 
     return docker_compose
 
