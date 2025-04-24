@@ -268,11 +268,11 @@ class NetworkInterface:
             Logger.log(f"Erro inesperado ao remover rota: {e}")
     
     @staticmethod
-    def config_interface(lsdb: Dict[str, Any]) -> bool:
+    def config_interface(lsdb: Dict[str, Any], vizinhos: Dict[str, Tuple[str, int]]) -> None:
         rotas = dijkstra(ROTEADOR_IP, lsdb)
         rotas_validas = {}
         for destino, proximo_salto in rotas.items():
-            for viz, (ip, _) in VIZINHOS.items():
+            for viz, (ip, _) in vizinhos.items():
                 if proximo_salto == ip:
                     rotas_validas[destino] = proximo_salto
                     break
@@ -294,6 +294,7 @@ class Router:
         """Inicializa o roteador e suas dependências."""
         # Configurações obtidas de variáveis de ambiente
         self.lsdb = {}  # Link State Database
+        self.vizinhos = {}
         self.lock = threading.Lock()
         
         Logger.log(f"Roteador inicializado com Nome: {ROTEADOR_IP}")
@@ -324,12 +325,11 @@ class Router:
         """Thread para enviar LSAs periodicamente."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        vizinhos_antigos = {}
         seq = 0
         
         while True:
             vizinhos_ativos = NetworkUtils.realizar_pings(VIZINHOS)
-            if self.comparar_vizinhos(vizinhos_antigos, vizinhos_ativos):
+            if self.comparar_vizinhos(self.vizinhos, vizinhos_ativos):
                 seq += 1
                 lsa = LSAHandler.criar_pacote_lsa(ROTEADOR_IP, seq, vizinhos_ativos) 
                 mensagem = json.dumps(lsa).encode()
@@ -339,9 +339,8 @@ class Router:
   
                 with self.lock:
                     self.lsdb[ROTEADOR_IP] = lsa
-                    NetworkInterface.config_interface(self.lsdb)
-  
-                vizinhos_antigos = vizinhos_ativos
+                    self.vizinhos = vizinhos_ativos
+                    NetworkInterface.config_interface(self.lsdb, self.vizinhos)
                 
     def thread_receber_lsa(self) -> None:
         """Thread para receber LSAs de outros roteadores."""
@@ -368,7 +367,7 @@ class Router:
                     
                     with self.lock:
                         self.lsdb[origem] = lsa
-                        NetworkInterface.config_interface(self.lsdb)
+                        NetworkInterface.config_interface(self.lsdb, self.vizinhos)
 
             except socket.error as e:
                 Logger.log(f"Erro ao receber LSA: {e}")
