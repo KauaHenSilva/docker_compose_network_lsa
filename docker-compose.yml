@@ -78,7 +78,7 @@ services:
       context: ./router
       dockerfile: Dockerfile
     environment:
-    - vizinhos=[router4, 172.20.4.3, 1],[router6, 172.20.6.3, 1]
+    - vizinhos=[router4, 172.20.4.3, 1]
     - my_ip=172.20.5.3
     - my_name=router5
     networks:
@@ -86,104 +86,9 @@ services:
         ipv4_address: 172.20.5.3
       subnet_4:
         ipv4_address: 172.20.4.2
-      subnet_6:
-        ipv4_address: 172.20.6.4
     cap_add:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.1
-      && python router.py"
-  router6:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - vizinhos=[router5, 172.20.5.3, 1],[router7, 172.20.7.3, 1]
-    - my_ip=172.20.6.3
-    - my_name=router6
-    networks:
-      subnet_6:
-        ipv4_address: 172.20.6.3
-      subnet_5:
-        ipv4_address: 172.20.5.2
-      subnet_7:
-        ipv4_address: 172.20.7.4
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.6.1
-      && python router.py"
-  router7:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - vizinhos=[router6, 172.20.6.3, 1],[router8, 172.20.8.3, 1]
-    - my_ip=172.20.7.3
-    - my_name=router7
-    networks:
-      subnet_7:
-        ipv4_address: 172.20.7.3
-      subnet_6:
-        ipv4_address: 172.20.6.2
-      subnet_8:
-        ipv4_address: 172.20.8.4
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.7.1
-      && python router.py"
-  router8:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - vizinhos=[router7, 172.20.7.3, 1],[router9, 172.20.9.3, 1]
-    - my_ip=172.20.8.3
-    - my_name=router8
-    networks:
-      subnet_8:
-        ipv4_address: 172.20.8.3
-      subnet_7:
-        ipv4_address: 172.20.7.2
-      subnet_9:
-        ipv4_address: 172.20.9.4
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.8.1
-      && python router.py"
-  router9:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - vizinhos=[router8, 172.20.8.3, 1],[router10, 172.20.10.3, 1]
-    - my_ip=172.20.9.3
-    - my_name=router9
-    networks:
-      subnet_9:
-        ipv4_address: 172.20.9.3
-      subnet_8:
-        ipv4_address: 172.20.8.2
-      subnet_10:
-        ipv4_address: 172.20.10.4
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.9.1
-      && python router.py"
-  router10:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    environment:
-    - vizinhos=[router9, 172.20.9.3, 1]
-    - my_ip=172.20.10.3
-    - my_name=router10
-    networks:
-      subnet_10:
-        ipv4_address: 172.20.10.3
-      subnet_9:
-        ipv4_address: 172.20.9.2
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.10.1
       && python router.py"
 networks:
   subnet_1:
@@ -216,33 +121,3 @@ networks:
       config:
       - subnet: 172.20.5.0/24
         gateway: 172.20.5.1
-  subnet_6:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.6.0/24
-        gateway: 172.20.6.1
-  subnet_7:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.7.0/24
-        gateway: 172.20.7.1
-  subnet_8:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.8.0/24
-        gateway: 172.20.8.1
-  subnet_9:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.9.0/24
-        gateway: 172.20.9.1
-  subnet_10:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.10.0/24
-        gateway: 172.20.10.1

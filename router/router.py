@@ -82,7 +82,7 @@ class NetworkUtils:
         for viz, (ip, ant_custo) in vizinhos.items():
             is_alive, tempo_ping = NetworkUtils._testar_ping(ip)
             if is_alive:
-                vizinhos_ativos[viz] = (ip, ant_custo)
+                vizinhos_ativos[viz] = (ip, tempo_ping)
             else:
                 Logger.log(f"Ping falhou para {viz} ({ip})")
         return vizinhos_ativos
@@ -277,21 +277,46 @@ class Router:
         Logger.log(f"Roteador inicializado com Nome: {ROTEADOR_IP}")
         Logger.log(f"Vizinhos configurados: {VIZINHOS}")
     
+    def comparar_vizinhos(self, vizinhos_antigos: Dict[str, Tuple[str, int]], vizinhos_ativos: Dict[str, Tuple[str, int]]) -> True:
+        """
+        Compara os vizinhos ativos com os antigos e retorna True se houver diferença.
+        
+        Args:
+            vizinhos_antigos: Dicionário de vizinhos antigos
+            vizinhos_ativos: Dicionário de vizinhos ativos
+            
+        Returns:
+            True se houver diferença, False caso contrário
+        """
+        if len(vizinhos_antigos) != len(vizinhos_ativos):
+            return True
+        
+        for viz, (ip, custo) in vizinhos_ativos.items():
+            if viz not in vizinhos_antigos or vizinhos_antigos[viz] != (ip, custo):
+                return True
+        
+        return False
+            
+        
     def thread_enviar_lsa(self) -> None:
         """Thread para enviar LSAs periodicamente."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        vizinhos_antigos = {}
         seq = 0
         
         while True:
             vizinhos_ativos = NetworkUtils.realizar_pings(VIZINHOS)
+            if self.comparar_vizinhos(vizinhos_antigos, vizinhos_ativos):
             
-            seq += 1
-            lsa = LSAHandler.criar_pacote_lsa(ROTEADOR_IP, seq, vizinhos_ativos) 
-            mensagem = json.dumps(lsa).encode()
+                seq += 1
+                lsa = LSAHandler.criar_pacote_lsa(ROTEADOR_IP, seq, vizinhos_ativos) 
+                mensagem = json.dumps(lsa).encode()
 
-            for viz, (ip, custo) in vizinhos_ativos.items():
-                LSAHandler.enviar_lsa_para_vizinho(sock, mensagem, viz, ip)
+                for viz, (ip, custo) in vizinhos_ativos.items():
+                    LSAHandler.enviar_lsa_para_vizinho(sock, mensagem, viz, ip)
+                
+                vizinhos_antigos = vizinhos_ativos
             
         
     def thread_receber_lsa(self) -> None:
@@ -353,7 +378,6 @@ class Router:
         for thread in threads:
             thread.start()
         threading.Event().wait()
-
 
 if __name__ == "__main__":
     # Inicializa e executa o roteador
