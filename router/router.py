@@ -84,7 +84,8 @@ class NetworkUtils:
             if is_alive:
                 vizinhos_ativos[viz] = (ip, tempo_ping)
             else:
-                Logger.log(f"Ping falhou para {viz} ({ip})")
+                # Logger.log(f"Ping falhou para {viz} ({ip})")
+                ...
         return vizinhos_ativos
 
 class LSAHandler:
@@ -194,7 +195,7 @@ class NetworkInterface:
             return {}, {}
     
     @staticmethod
-    def configurar_interface(destino: str, proximo_salto: str) -> bool:
+    def adicionar_interface(destino: str, proximo_salto: str) -> bool:
         """
         Configura a interface de rede para o próximo salto.
         
@@ -265,6 +266,26 @@ class NetworkInterface:
             Logger.log(f"Erro ao remover rota: {e}")
         except Exception as e:
             Logger.log(f"Erro inesperado ao remover rota: {e}")
+    
+    @staticmethod
+    def config_interface(lsdb: Dict[str, Any]) -> bool:
+        rotas = dijkstra(ROTEADOR_IP, lsdb)
+        rotas_validas = {}
+        for destino, proximo_salto in rotas.items():
+            for viz, (ip, _) in VIZINHOS.items():
+                if proximo_salto == ip:
+                    rotas_validas[destino] = proximo_salto
+                    break
+        
+        rotas_adicionar, rotas_remover = NetworkInterface.obter_rotas_existentes(rotas_validas)
+        for destino, proximo_salto in rotas_adicionar.items():
+            if NetworkInterface.adicionar_interface(destino, proximo_salto):
+                Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
+                
+        for destino in rotas_remover.keys():
+            if NetworkInterface.remover_interfaces(destino):
+                Logger.log(f"Rota removida: {destino}")
+            
 
 class Router:
     """Classe principal do roteador."""
@@ -273,6 +294,7 @@ class Router:
         """Inicializa o roteador e suas dependências."""
         # Configurações obtidas de variáveis de ambiente
         self.lsdb = {}  # Link State Database
+        self.lock = threading.Lock()
         
         Logger.log(f"Roteador inicializado com Nome: {ROTEADOR_IP}")
         Logger.log(f"Vizinhos configurados: {VIZINHOS}")
@@ -308,17 +330,19 @@ class Router:
         while True:
             vizinhos_ativos = NetworkUtils.realizar_pings(VIZINHOS)
             if self.comparar_vizinhos(vizinhos_antigos, vizinhos_ativos):
-            
                 seq += 1
                 lsa = LSAHandler.criar_pacote_lsa(ROTEADOR_IP, seq, vizinhos_ativos) 
                 mensagem = json.dumps(lsa).encode()
-
+                
                 for viz, (ip, custo) in vizinhos_ativos.items():
                     LSAHandler.enviar_lsa_para_vizinho(sock, mensagem, viz, ip)
-                
+  
+                with self.lock:
+                    self.lsdb[ROTEADOR_IP] = lsa
+                    NetworkInterface.config_interface(self.lsdb)
+  
                 vizinhos_antigos = vizinhos_ativos
-            
-        
+                
     def thread_receber_lsa(self) -> None:
         """Thread para receber LSAs de outros roteadores."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -336,31 +360,16 @@ class Router:
                 
                 lsa = json.loads(dados.decode())
                 origem = lsa["id"]
-            
-                self.lsdb[origem] = lsa
 
-                if origem != ROTEADOR_NAME:
+                if origem not in self.lsdb or lsa["seq"] > self.lsdb[origem]["seq"]:
                     for viz, (ip, custo) in VIZINHOS.items():
                         if ip != addr[0]:
                             sock.sendto(dados, (ip, PORTA_LSA))
-                
-                rotas = dijkstra(ROTEADOR_IP, self.lsdb)
-                rotas_validas = {}
-                for destino, proximo_salto in rotas.items():
-                    for viz, (ip, _) in VIZINHOS.items():
-                        if proximo_salto == ip:
-                            rotas_validas[destino] = proximo_salto
-                            break
-                
-                rotas_adicionar, rotas_remover = NetworkInterface.obter_rotas_existentes(rotas_validas)
-                for destino, proximo_salto in rotas_adicionar.items():
-                    if NetworkInterface.configurar_interface(destino, proximo_salto):
-                        Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
-                        
-                for destino in rotas_remover.keys():
-                    if NetworkInterface.remover_interfaces(destino):
-                        Logger.log(f"Rota removida: {destino}")
                     
+                    with self.lock:
+                        self.lsdb[origem] = lsa
+                        NetworkInterface.config_interface(self.lsdb)
+
             except socket.error as e:
                 Logger.log(f"Erro ao receber LSA: {e}")
             except json.JSONDecodeError:

@@ -26,27 +26,23 @@ def generate_docker_compose(num_subnets):
         my_ip = f'172.20.{i}.3'
 
         vizinhos = []
+        networks = {}
         
         if i > 1:
             vizinhos.append(f"[router{i-1}, 172.20.{i-1}.3, 1]")
-            
-        if i < num_subnets:
-            vizinhos.append(f"[router{i+1}, 172.20.{i+1}.3, 1]")
-
-        networks = {}
-        networks[f"subnet_{i}"] = {
-            'ipv4_address': my_ip
-        }
-        
-        if i > 1:
             networks[f"subnet_{i-1}"] = {
                 'ipv4_address': f'172.20.{i-1}.2'
             }
-        
+            
         if i < num_subnets:
+            vizinhos.append(f"[router{i+1}, 172.20.{i+1}.3, 1]")
             networks[f"subnet_{i+1}"] = {
                 'ipv4_address': f'172.20.{i+1}.4'
             }
+
+        networks[f"subnet_{i}"] = {
+            'ipv4_address': my_ip
+        }
 
         docker_compose['services'][router_name] = {
             'build': {
