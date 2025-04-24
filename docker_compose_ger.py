@@ -13,7 +13,8 @@ def generate_docker_compose(num_subnets):
             'driver': 'bridge',
             'ipam': {
                 'config': [{
-                    'subnet': f'172.20.{i}.0/24'
+                    'subnet': f'172.20.{i}.0/24',
+                    'gateway': f'172.20.{i}.1',
                 }]
             }
         }
@@ -21,16 +22,20 @@ def generate_docker_compose(num_subnets):
     # Criar roteadores interligados
     for i in range(1, num_subnets + 1):
         router_name = f"router{i}"
+        gateway = f'172.20.{i}.1'
+        my_ip = f'172.20.{i}.3'
 
-        links = []
+        vizinhos = []
+        
         if i > 1:
-            links.append(f"router{i-1}")
+            vizinhos.append(f"[router{i-1}, 172.20.{i-1}.3, 1]")
+            
         if i < num_subnets:
-            links.append(f"router{i+1}")
+            vizinhos.append(f"[router{i+1}, 172.20.{i+1}.3, 1]")
 
         networks = {}
         networks[f"subnet_{i}"] = {
-            'ipv4_address': f'172.20.{i}.3'
+            'ipv4_address': my_ip
         }
         
         if i > 1:
@@ -49,14 +54,15 @@ def generate_docker_compose(num_subnets):
                 'dockerfile': 'Dockerfile'
             },
             'environment': [
-                f"router_links={','.join(links)}",
-                f"my_ip={networks[f'subnet_{i}']['ipv4_address']}",
+                f"vizinhos={','. join(vizinhos)}",
+                f"my_ip={my_ip}",
                 f"my_name={router_name}"
             ],
             'networks': networks,
             'cap_add': [
                 'NET_ADMIN'
-            ]
+            ],
+            'command': f'/bin/bash -c "ip route del default && ip route add default via {gateway} && python router.py"'
         }
 
     # # Gerar hosts para cada subrede
