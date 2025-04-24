@@ -1,9 +1,11 @@
-ger:
-	@python3 docker_compose_ger.py
-
 up:
 	@docker compose down
 	@docker compose up --build
+
+ger_fila:
+	@python3 docker_compose_ger_fila.py
+
+
 
 down:
 	@docker compose down

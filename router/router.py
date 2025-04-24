@@ -278,13 +278,13 @@ class NetworkInterface:
                     break
         
         rotas_adicionar, rotas_remover = NetworkInterface.obter_rotas_existentes(rotas_validas)
-        for destino, proximo_salto in rotas_adicionar.items():
-            if NetworkInterface.adicionar_interface(destino, proximo_salto):
-                Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
-                
         for destino in rotas_remover.keys():
             if NetworkInterface.remover_interfaces(destino):
                 Logger.log(f"Rota removida: {destino}")
+                
+        for destino, proximo_salto in rotas_adicionar.items():
+            if NetworkInterface.adicionar_interface(destino, proximo_salto):
+                Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
             
 
 class Router:
