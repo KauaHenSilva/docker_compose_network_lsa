@@ -184,9 +184,9 @@ class NetworkInterface:
                 if rede not in rotas_existentes or rotas_existentes[rede] != proximo_salto:
                     rotas_adicionar[rede] = proximo_salto
             
-            for rede, proximo_salto in rotas_existentes.items():
-                if rede not in novas_rotas:
-                    rotas_remover[rede] = proximo_salto
+            # for rede, proximo_salto in rotas_existentes.items():
+            #     if rede not in novas_rotas:
+            #         rotas_remover[rede] = proximo_salto
             
             return rotas_adicionar, rotas_remover
         

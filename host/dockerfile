@@ -4,5 +4,4 @@ WORKDIR /app
 COPY . .
 
 RUN apt-get update && apt-get install -y iproute2 iputils-ping net-tools 
-
-CMD ["python", "host.py"]
+CMD [ "python3", "host.py" ]

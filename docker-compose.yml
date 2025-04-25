@@ -14,8 +14,34 @@ services:
         ipv4_address: 172.20.1.3
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
       && python router.py"
+  host10:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_1:
+        ipv4_address: 172.20.1.10
+    depends_on:
+    - router1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
+  host11:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_1:
+        ipv4_address: 172.20.1.11
+    depends_on:
+    - router1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
   router2:
     build:
       context: ./router
@@ -33,8 +59,34 @@ services:
         ipv4_address: 172.20.2.3
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.3
       && python router.py"
+  host20:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_2:
+        ipv4_address: 172.20.2.10
+    depends_on:
+    - router2
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
+  host21:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_2:
+        ipv4_address: 172.20.2.11
+    depends_on:
+    - router2
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
   router3:
     build:
       context: ./router
@@ -52,8 +104,34 @@ services:
         ipv4_address: 172.20.3.3
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.3
       && python router.py"
+  host30:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_3:
+        ipv4_address: 172.20.3.10
+    depends_on:
+    - router3
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
+  host31:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_3:
+        ipv4_address: 172.20.3.11
+    depends_on:
+    - router3
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
   router4:
     build:
       context: ./router
@@ -71,8 +149,34 @@ services:
         ipv4_address: 172.20.4.3
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.3
       && python router.py"
+  host40:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_4:
+        ipv4_address: 172.20.4.10
+    depends_on:
+    - router4
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
+  host41:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_4:
+        ipv4_address: 172.20.4.11
+    depends_on:
+    - router4
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
   router5:
     build:
       context: ./router
@@ -88,8 +192,34 @@ services:
         ipv4_address: 172.20.5.3
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.3
       && python router.py"
+  host50:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_5:
+        ipv4_address: 172.20.5.10
+    depends_on:
+    - router5
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
+  host51:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_5:
+        ipv4_address: 172.20.5.11
+    depends_on:
+    - router5
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.3
+      dev eth0 && python host.py"
+    cap_add:
+    - NET_ADMIN
 networks:
   subnet_1:
     driver: bridge
