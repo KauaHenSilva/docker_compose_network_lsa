@@ -26,12 +26,9 @@ def extract_num_host(name):
     exemplo:
       nome: 'prova_1_rayner-host11-1
       resultado: 1, 1
-    
-    
     """
     pre = name.split('-')[1]
     result = pre.split('host')[1]
-    
     return result[0], result[1]
 
 def ping_task(frm, to, ip, results, lock_thread):
@@ -39,10 +36,11 @@ def ping_task(frm, to, ip, results, lock_thread):
     start = time.time()
     cmd = f"docker exec {frm} ping -c1 -W0.1 {ip} > /dev/null 2>&1"
     print(f"{Colors.YELLOW}{cmd}{Colors.NC}")
+
     code = os.system(cmd)
     elapsed = time.time() - start
     success = (code == 0)
-    
+
     with lock_thread:
         results.append((frm, to, success, elapsed))
 
@@ -54,7 +52,6 @@ def main():
         return
     
     tasks = [(frm, to, f"172.20.{extract_num_host(to)[0]}.1{extract_num_host(to)[1]}") for frm in users for to in users if frm != to]
-    
     
     results = []
     threads = []
