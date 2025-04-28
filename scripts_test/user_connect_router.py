@@ -40,7 +40,7 @@ def extract_num_host(name):
 def ping_task(frm, to, ip, results, lock_thread):
     """Thread worker: executa ping e armazena resultado."""
     start = time.time()
-    cmd = f"docker exec {frm} ping -c1 -W0.1 {ip} > /dev/null 2>&1"
+    cmd = f"docker exec {frm} ping -c 5 -W 0.1 {ip} > /dev/null 2>&1"
     print(f"{Colors.YELLOW}{cmd}{Colors.NC}")
     code = os.system(cmd)
     elapsed = time.time() - start
