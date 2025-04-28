@@ -187,9 +187,14 @@ class NetworkInterface:
                 #     proximo_salto = partes[-1]
                 #     rotas_existentes[rede] = proximo_salto
                 
+            # Replase rotas que mudaram
+            for rede, proximo_salto in novas_rotas.items():
+                if (rede in rotas_existentes) and (novas_rotas[rede] != rotas_existentes[rede]):
+                    rotas_replase[rede] = proximo_salto
+                    
             # Adicionar rotas inexistentes
             for rede, proximo_salto in novas_rotas.items():
-                if (rede not in rotas_existentes) or (novas_rotas[rede] != rotas_existentes[rede]):
+                if (rede not in rotas_existentes) and (rede not in rotas_replase):
                     rotas_adicionar[rede] = proximo_salto
             
             # Remover rotas que não estão mais ativas
@@ -197,10 +202,6 @@ class NetworkInterface:
                 if (rede not in novas_rotas):
                     rotas_remover[rede] = proximo_salto
                     
-            # Replase rotas que mudaram
-            for rede, proximo_salto in novas_rotas.items():
-                if (rede in rotas_existentes) and (novas_rotas[rede] != rotas_existentes[rede]):
-                    rotas_replase[rede] = proximo_salto
 
             return rotas_adicionar, rotas_remover, rotas_replase
         
