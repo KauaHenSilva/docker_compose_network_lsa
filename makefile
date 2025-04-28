@@ -5,6 +5,12 @@ up:
 ger_fila:
 	@python3 docker_compose_ger_fila.py
 
+ger_enu:
+	@python3 docker_compose_ger_enu.py
+
+ger_cir:
+	@python3 docker_compose_ger_cir.py
+
 down:
 	@docker compose down
 

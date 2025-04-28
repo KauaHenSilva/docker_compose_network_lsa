@@ -139,7 +139,7 @@ class LSAHandler:
 class NetworkInterface:
     
     @staticmethod
-    def obter_rotas_existentes(rotas: Dict[str, str]) -> Tuple[Dict[str, str], Dict[str, str]]:
+    def obter_rotas_existentes(rotas: Dict[str, str]) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
         """
         Obtém todas as rotas existentes no sistema e compara com as novas rotas.
         
@@ -149,10 +149,12 @@ class NetworkInterface:
         Returns:
             Dicionário com as novas rotas a serem adicionadas
             Dicionário com as rotas a serem removidas
+            Dicionário com as rotas a serem substituídas
         """
         rotas_existentes = {}
         rotas_adicionar = {}
         rotas_remover = {}
+        rotas_replase = {}
         
         try:
             # Padroniza formato das novas rotas
@@ -174,26 +176,38 @@ class NetworkInterface:
             # Processa cada linha do resultado
             for linha in resultado.stdout.splitlines():
                 partes = linha.split()
-                # Ignora rotas default e processa apenas rotas com 'via'
-                if len(partes) >= 3 and partes[0] != "default" and partes[1] == "via":
+                
+                if partes[0] != "default" and partes[1] == "via":
                     rede = partes[0]  # ex: 172.20.5.0/24
                     proximo_salto = partes[2]  # ex: 172.20.4.3
                     rotas_existentes[rede] = proximo_salto
-            
+                    
+                # elif partes[1] == 'dev':
+                #     rede = partes[0]
+                #     proximo_salto = partes[-1]
+                #     rotas_existentes[rede] = proximo_salto
+                
+            # Adicionar rotas inexistentes
             for rede, proximo_salto in novas_rotas.items():
-                if rede not in rotas_existentes or rotas_existentes[rede] != proximo_salto:
+                if (rede not in rotas_existentes) or (novas_rotas[rede] != rotas_existentes[rede]):
                     rotas_adicionar[rede] = proximo_salto
             
+            # Remover rotas que não estão mais ativas
             for rede, proximo_salto in rotas_existentes.items():
-                if rede not in novas_rotas:
+                if (rede not in novas_rotas):
                     rotas_remover[rede] = proximo_salto
-            
-            return rotas_adicionar, rotas_remover
+                    
+            # Replase rotas que mudaram
+            for rede, proximo_salto in novas_rotas.items():
+                if (rede in rotas_existentes) and (novas_rotas[rede] != rotas_existentes[rede]):
+                    rotas_replase[rede] = proximo_salto
+
+            return rotas_adicionar, rotas_remover, rotas_replase
         
         except Exception as e:
             Logger.log(f"Erro ao obter rotas existentes: {e}")
             return {}, {}
-    
+        
     @staticmethod
     def adicionar_interface(destino: str, proximo_salto: str) -> bool:
         """
@@ -231,14 +245,16 @@ class NetworkInterface:
             # if interface is None:
             #     Logger.log(f"Interface não encontrada para o próximo salto {proximo_salto}")
             #     exit(1)
+            
+            # if NetworkInterface.get_destino_existe(destino):
+            #     NetworkInterface.remover_interfaces(destino)
                 
             command_add = f"ip route add {destino} via {proximo_salto}"
-            
             process = subprocess.run(
                 command_add.split(),
-                check=True
+                capture_output=True,
             )
-            
+ 
             return True
             
         except subprocess.CalledProcessError as e:
@@ -266,10 +282,50 @@ class NetworkInterface:
             Logger.log(f"Erro ao remover rota: {e}")
         except Exception as e:
             Logger.log(f"Erro inesperado ao remover rota: {e}")
+            
+    def salvar_lsdb_rotas_arquivo(lsdb: Dict[str, Any], rotas: Dict[str, str]) -> None:
+        """
+        Salva a LSDB em um arquivo JSON.
+        
+        Args:
+            lsdb: Dicionário com a LSDB
+        """
+        try:
+            with open("lsdb.json", "w") as file:
+                json.dump(lsdb, file, indent=4)
+            # Logger.log("LSDB salva em lsdb.json")
+            with open("rotas.json", "w") as file:
+                json.dump(rotas, file, indent=4)
+            # Logger.log("Rotas salvas em rotas.json")
+        except Exception as e:
+            Logger.log(f"Erro ao salvar LSDB: {e}")
+            
+    def replase_interface(destino: str, proximo_salto: str) -> None:
+        """
+        Replase a configuração da interface de rede.
+        
+        Args:
+            destino: Endereço IP de destino
+            proximo_salto: Endereço IP do próximo salto
+        """
+        try:
+            command = f"ip route replace {destino} via {proximo_salto}"
+            process = subprocess.run(command.split(), check=True)
+            if process.returncode == 0:
+                Logger.log(f"Rota substituída: {destino} via {proximo_salto}")
+            else:
+                Logger.log(f"Erro ao substituir rota: {process.stderr.decode()}")
+        except subprocess.CalledProcessError as e:
+            Logger.log(f"Erro ao substituir rota: {e}")
+        except Exception as e:
+            Logger.log(f"Erro inesperado ao substituir rota: {e}")
+        return False
     
     @staticmethod
     def config_interface(lsdb: Dict[str, Any], vizinhos: Dict[str, Tuple[str, int]]) -> None:
         rotas = dijkstra(ROTEADOR_IP, lsdb)
+        NetworkInterface.salvar_lsdb_rotas_arquivo(lsdb, rotas)
+        
         rotas_validas = {}
         for destino, proximo_salto in rotas.items():
             for viz, (ip, _) in vizinhos.items():
@@ -277,7 +333,7 @@ class NetworkInterface:
                     rotas_validas[destino] = proximo_salto
                     break
         
-        rotas_adicionar, rotas_remover = NetworkInterface.obter_rotas_existentes(rotas_validas)
+        rotas_adicionar, rotas_remover, rotas_replase = NetworkInterface.obter_rotas_existentes(rotas_validas)
         for destino in rotas_remover.keys():
             if NetworkInterface.remover_interfaces(destino):
                 Logger.log(f"Rota removida: {destino}")
@@ -285,6 +341,10 @@ class NetworkInterface:
         for destino, proximo_salto in rotas_adicionar.items():
             if NetworkInterface.adicionar_interface(destino, proximo_salto):
                 Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
+                
+        for destino, proximo_salto in rotas_replase.items():
+            if NetworkInterface.replase_interface(destino, proximo_salto):
+                Logger.log(f"Rota substituída: {destino} via {proximo_salto}")
             
 
 class Router:
