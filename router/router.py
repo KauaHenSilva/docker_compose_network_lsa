@@ -54,7 +54,7 @@ class NetworkUtils:
         init_ping = time.time()
         try:
             process = subprocess.run(
-                ["ping", "-c", "1", "-W", "1", ip],
+                ["ping", "-c", "5", "-W", "1", ip],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
