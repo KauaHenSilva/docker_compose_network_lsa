@@ -225,39 +225,15 @@ class NetworkInterface:
             parts = destino.split('.')
             network_prefix = '.'.join(parts[:3])
             destino = f"{network_prefix}.0/24"
-            
-            # interface = None
-            # try:
-            #     ip_info = subprocess.run(
-            #         ["ip", "route", "get", proximo_salto],
-            #         capture_output=True,
-            #         text=True,
-            #         check=True
-            #     )
-                
-            #     for line in ip_info.stdout.splitlines():
-            #         if "dev" in line:
-            #             interface = line.split("dev")[1].strip().split()[0]
-            #             break
-            # except:
-            #     Logger.log(f"Gateway {proximo_salto} não é diretamente alcançável")
-            #     return False
-                
-            # if interface is None:
-            #     Logger.log(f"Interface não encontrada para o próximo salto {proximo_salto}")
-            #     exit(1)
-            
-            # if NetworkInterface.get_destino_existe(destino):
-            #     NetworkInterface.remover_interfaces(destino)
                 
             command_add = f"ip route add {destino} via {proximo_salto}"
             process = subprocess.run(
                 command_add.split(),
                 capture_output=True,
             )
- 
+            Logger.log(f"Rota Alterada: {destino} via {proximo_salto}")
+
             return True
-            
         except subprocess.CalledProcessError as e:
             Logger.log(f"Erro ao adicionar rota: {e}")
             return False
@@ -310,10 +286,14 @@ class NetworkInterface:
             proximo_salto: Endereço IP do próximo salto
         """
         try:
+            parts = destino.split('.')
+            network_prefix = '.'.join(parts[:3])
+            destino = f"{network_prefix}.0/24"
+            
             command = f"ip route replace {destino} via {proximo_salto}"
             process = subprocess.run(command.split(), check=True)
             if process.returncode == 0:
-                Logger.log(f"Rota substituída: {destino} via {proximo_salto}")
+                Logger.log(f"Rota Alterada: {destino} via {proximo_salto}")
             else:
                 Logger.log(f"Erro ao substituir rota: {process.stderr.decode()}")
         except subprocess.CalledProcessError as e:
@@ -336,17 +316,13 @@ class NetworkInterface:
         
         rotas_adicionar, rotas_remover, rotas_replase = NetworkInterface.obter_rotas_existentes(rotas_validas)
         for destino in rotas_remover.keys():
-            if NetworkInterface.remover_interfaces(destino):
-                Logger.log(f"Rota removida: {destino}")
+            NetworkInterface.remover_interfaces(destino)
                 
         for destino, proximo_salto in rotas_adicionar.items():
-            if NetworkInterface.adicionar_interface(destino, proximo_salto):
-                Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
+            NetworkInterface.adicionar_interface(destino, proximo_salto)
                 
         for destino, proximo_salto in rotas_replase.items():
-            if NetworkInterface.replase_interface(destino, proximo_salto):
-                Logger.log(f"Rota substituída: {destino} via {proximo_salto}")
-            
+            NetworkInterface.replase_interface(destino, proximo_salto)
 
 class Router:
     """Classe principal do roteador."""
