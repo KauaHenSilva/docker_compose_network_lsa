@@ -152,6 +152,8 @@ class NetworkInterface:
             Dicionário com as rotas a serem substituídas
         """
         rotas_existentes = {}
+        rotas_sistema = {}
+        
         rotas_adicionar = {}
         rotas_remover = {}
         rotas_replase = {}
@@ -182,19 +184,19 @@ class NetworkInterface:
                     proximo_salto = partes[2]  # ex: 172.20.4.3
                     rotas_existentes[rede] = proximo_salto
                     
-                # elif partes[1] == 'dev':
-                #     rede = partes[0]
-                #     proximo_salto = partes[-1]
-                #     rotas_existentes[rede] = proximo_salto
+                elif partes[1] == 'dev':
+                    rede = partes[0]
+                    proximo_salto = partes[-1]
+                    rotas_sistema[rede] = proximo_salto
                 
             # Replase rotas que mudaram
             for rede, proximo_salto in novas_rotas.items():
-                if (rede in rotas_existentes) and (novas_rotas[rede] != rotas_existentes[rede]):
+                if (rede in rotas_existentes) and (rotas_existentes[rede] != proximo_salto):
                     rotas_replase[rede] = proximo_salto
                     
             # Adicionar rotas inexistentes
             for rede, proximo_salto in novas_rotas.items():
-                if (rede not in rotas_existentes) and (rede not in rotas_replase):
+                if (rede not in rotas_existentes) and (rede not in rotas_sistema):
                     rotas_adicionar[rede] = proximo_salto
             
             # Remover rotas que não estão mais ativas
@@ -202,7 +204,6 @@ class NetworkInterface:
                 if (rede not in novas_rotas):
                     rotas_remover[rede] = proximo_salto
                     
-
             return rotas_adicionar, rotas_remover, rotas_replase
         
         except Exception as e:
@@ -210,7 +211,7 @@ class NetworkInterface:
             return {}, {}
         
     @staticmethod
-    def adicionar_interface(destino: str, proximo_salto: str) -> bool:
+    def adicionar_interface(destino: str, proximo_salto: str):
         """
         Configura a interface de rede para o próximo salto.
         
@@ -231,15 +232,14 @@ class NetworkInterface:
                 command_add.split(),
                 capture_output=True,
             )
-            Logger.log(f"Rota Alterada: {destino} via {proximo_salto}")
-
-            return True
+            if process.returncode == 0:
+                Logger.log(f"Rota adicionada: {destino} via {proximo_salto}")
+            else:
+                Logger.log(f"Erro ao adicionar rota: {process.stderr.decode()}")
         except subprocess.CalledProcessError as e:
             Logger.log(f"Erro ao adicionar rota: {e}")
-            return False
         except Exception as e:
             Logger.log(f"Erro inesperado ao adicionar rota: {e}")
-            return False
 
     @staticmethod
     def remover_interfaces(destino: str) -> None:
@@ -300,7 +300,6 @@ class NetworkInterface:
             Logger.log(f"Erro ao substituir rota: {e}")
         except Exception as e:
             Logger.log(f"Erro inesperado ao substituir rota: {e}")
-        return False
     
     @staticmethod
     def config_interface(lsdb: Dict[str, Any], vizinhos: Dict[str, Tuple[str, int]]) -> None:
