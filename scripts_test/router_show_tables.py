@@ -1,3 +1,11 @@
+"""
+Visualizador de Tabelas de Roteamento
+------------------------------------
+Este script exibe as tabelas de roteamento de todos os roteadores
+em execução no ambiente Docker, facilitando a depuração e validação
+do estado da rede.
+"""
+
 import sys
 import os
 
@@ -31,6 +39,10 @@ def get_routing_table(container):
     return result.strip()
 
 def main():
+    """
+    Função principal que obtém e exibe as tabelas de roteamento de todos os roteadores.
+    Cada tabela é exibida com formatação colorida para facilitar a leitura.
+    """
     # Obtém os roteadores
     routers = get_router_containers()
     if not routers:
@@ -56,4 +68,4 @@ def main():
         print(f"{Colors.BOLD}{Colors.CYAN}========================================{Colors.NC}", end='\n\n')
 
 if __name__ == "__main__":
-    main() 
+    main()

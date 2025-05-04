@@ -1,7 +1,7 @@
 # Implementação do Algoritmo de Estado de Enlace com Docker e Python
 
 ## Universidade Federal do Piauí - Campus Senador Helvídio Nunes de Barros
-### Curso de Bacharel Sistemas de Informação
+### Curso de Bacharel em Sistemas de Informação
 ### Disciplina: Redes de Computadores II
 
 ## Sobre o Projeto
@@ -10,43 +10,108 @@ Este projeto implementa uma simulação de rede de computadores composta por hos
 
 ### Objetivos
 
-- Simular uma rede com múltiplas subredes, cada uma contendo 2 hosts e 1 roteador
-- Implementar uma topologia aleatória entre os roteadores (parcialmente conectada)
-- Implementar o algoritmo de estado de enlace em cada roteador
-- Manter uma base de dados de enlaces (LSDB) e tabela de roteamento atualizada
-- Utilizar threads para receber e transmitir pacotes de estado de enlace
-- Implementar comunicação entre roteadores usando TCP/UDP
+- [x] Simular uma rede com múltiplas subredes, cada uma contendo 2 hosts e 1 roteador
+- [x] Implementar topologias entre os roteadores, pelo menos parcialmente conectada. (fila, anel)
+- [x] Implementar o algoritmo de estado de enlace em cada roteador
+- [x] Manter uma base de dados de enlaces (LSDB) e tabela de roteamento atualizada
+- [x] Utilizar threads para receber e transmitir pacotes de estado de enlace
+- [x] Implementar comunicação entre roteadores usando UDP Ou TCP
 
 ## Tecnologias Utilizadas
 
-- **Python**: Desenvolvimento da lógica dos roteadores e hosts
-- **Docker**: Criação e simulação dos elementos da rede
-- **Comando route**: Manutenção da tabela de roteamento nos roteadores
+- **Python 3**: Desenvolvimento da lógica dos roteadores e hosts
+- **Docker e Docker Compose**: Criação e simulação dos elementos da rede
+- **Biblioteca Threading**: Implementação de concorrência para operações paralelas
+- **Socket UDP**: Comunicação entre roteadores para troca de LSAs
+- **Comando `ip route`**: Manutenção da tabela de roteamento nos roteadores
+
+## Estrutura do Projeto
+
+```
+prova_1_rayner/
+├── router/                    # Implementação dos roteadores
+│   ├── router.py              # Código principal do roteador
+│   ├── dycastra.py            # Implementação do algoritmo de Dijkstra
+│   ├── formater.py            # Utilitário para formatação de dados
+│   └── Dockerfile             # Configuração para build do container
+├── host/                      # Implementação dos hosts
+│   ├── host.py                # Código do host cliente
+│   └── Dockerfile             # Configuração para build do container
+├── scripts_test/              # Scripts de teste e verificação
+│   ├── router_show_tables.py  # Exibe tabelas de roteamento
+│   ├── router_connect_router.py # Testa conectividade entre roteadores
+│   ├── user_connect_router.py # Testa conectividade de hosts para roteadores
+│   └── user_connect_user.py   # Testa conectividade entre hosts
+├── docker_compose_ger_fila.py # Gerador de topologia em fila
+├── docker_compose_ger_cir.py  # Gerador de topologia em anel
+├── docker_compose_ger_enu.py  # Gerador de topologia em malha
+└── makefile                   # Comandos para facilitar a execução
+```
+
+## Checklist de Funcionalidades
+
+- [x] **Roteamento dinâmico**
+  - [x] Implementação do algoritmo de Dijkstra
+  - [x] Cálculo de menor caminho entre roteadores
+  - [x] Atualização automática de rotas
+
+- [x] **Comunicação entre roteadores**
+  - [x] Envio periódico de Link State Advertisements (LSA)
+  - [x] Inundação controlada de LSAs na rede
+  - [x] Atualização da base de dados LSDB
+
+- [x] **Gerenciamento de tabelas de roteamento**
+  - [x] Adição de novas rotas via `ip route add`
+  - [x] Remoção de rotas obsoletas via `ip route del`
+  - [x] Substituição de rotas modificadas via `ip route replace`
+
+- [x] **Tolerância a falhas**
+  - [x] Detecção de vizinhos inativos via ping
+  - [x] Recálculo de rotas quando a topologia muda
+  - [x] Sequenciamento de LSAs para evitar loops
+
+- [x] **Topologias suportadas**
+  - [x] Topologia em fila (linear)
+  - [x] Topologia em anel (circular)
 
 ## Como Executar o Projeto
 
 ### Pré-requisitos
 
-- Docker e Docker Compose instalados
+- Docker (versão 20.10 ou superior)
+- Docker Compose (versão 2.0 ou superior)
 - Python 3.8 ou superior
 - Make (opcional, para usar os comandos do Makefile)
 
-### Passos para Execução
+### Passos Detalhados para Execução
 
 1. **Clone o repositório**:
    ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   cd seu-repositorio
+   git clone https://github.com/KauaHenSilva/{Nome_Repositorio}.git
+   cd {Nome_Repositorio}
    ```
 
-2. **Gere o arquivo docker-compose.yml**:
+2. **Escolha e gere a topologia desejada**:
+   
+   Para topologia em fila:
    ```bash
-   make ger
+   make ger_fila
    ```
    ou
    ```bash
-   python3 docker_compose_ger.py
+   python3 docker_compose_ger_fila.py
    ```
+   
+   Para topologia em anel:
+   ```bash
+   make ger_cir
+   ```
+   ou
+   ```bash
+   python3 docker_compose_ger_cir.py
+   ```
+   
+   Quando solicitado, insira o número de subredes (recomendado: entre 3 e 10).
 
 3. **Inicie os containers**:
    ```bash
@@ -56,26 +121,52 @@ Este projeto implementa uma simulação de rede de computadores composta por hos
    ```bash
    docker compose up --build
    ```
-
-4. **Verifique as tabelas de roteamento**:
+   
+   Use a flag `-d` para executar em segundo plano:
    ```bash
-   make show-tables
+   docker compose up --build -d
+   ```
+
+4. **Aguarde a convergência da rede**:
+   Após iniciar os containers, aguarde aproximadamente 30 segundos para que os roteadores estabeleçam suas tabelas de roteamento.
+
+5. **Verifique as tabelas de roteamento**:
+   ```bash
+   make router-show-tables
    ```
    ou
    ```bash
-   python3 scripts_test/show_tables.py
+   python3 scripts_test/router_show_tables.py
    ```
 
-5. **Teste a conectividade entre roteadores**:
+6. **Teste a conectividade entre roteadores**:
    ```bash
-   make test-connectivity
+   make router-connect-router
    ```
    ou
    ```bash
-   python3 scripts_test/test_connectivity.py
+   python3 scripts_test/router_connect_router.py
    ```
 
-6. **Para encerrar os containers**:
+7. **Teste a conectividade entre hosts e roteadores**:
+   ```bash
+   make user-connect-router
+   ```
+   ou
+   ```bash
+   python3 scripts_test/user_connect_router.py
+   ```
+
+8. **Teste a conectividade entre hosts**:
+   ```bash
+   make user-connect-user
+   ```
+   ou
+   ```bash
+   python3 scripts_test/user_connect_user.py
+   ```
+
+9. **Para encerrar os containers**:
    ```bash
    make down
    ```
@@ -84,15 +175,35 @@ Este projeto implementa uma simulação de rede de computadores composta por hos
    docker compose down
    ```
 
-7. **Para limpar completamente (remover imagens e volumes)**:
-   ```bash
-   make clear
-   ```
-   ou
-   ```bash
-   docker compose down --rmi all --volumes --remove-orphans
-   docker network prune -f
-   ```
+10. **Para limpar completamente (remover imagens e volumes)**:
+    ```bash
+    make clear
+    ```
+    ou
+    ```bash
+    docker compose down --rmi all --volumes --remove-orphans
+    docker network prune -f
+    ```
+
+### Verificação de Sucesso
+
+A implementação foi bem-sucedida quando:
+
+- [x] Todos os roteadores possuem rotas para todas as subredes
+- [x] O teste de conectividade entre roteadores mostra 100% de sucesso
+- [x] O teste de conectividade entre hosts mostra 100% de sucesso
+- [x] As tabelas de roteamento são atualizadas automaticamente quando há mudanças na topologia
+
+### Solução de Problemas
+
+- **Problema**: Alguns pings estão falhando:
+  - Solução: Aguarde mais tempo para a convergência da rede ou reinicie os containers.
+
+- **Problema**: Containers não iniciam:
+  - Solução: Verifique se o arquivo docker-compose.yml foi gerado corretamente.
+
+- **Problema**: Erro nas configurações de IP:
+  - Solução: Verifique se não há conflito de IP em sua máquina host.
 
 ## Justificativa do Protocolo Escolhido
 
@@ -108,14 +219,16 @@ Embora o TCP ofereça garantia de entrega, sua sobrecarga de estabelecimento de 
 
 ## Construção da Topologia
 
-A topologia da rede é gerada aleatoriamente pelo script `docker_compose_ger.py`, que:
+A topologia da rede é gerada pelos scripts `docker_compose_ger_*.py`, que:
 
-1. Cria múltiplas subredes, cada uma com 2 hosts e 1 roteador
-2. Estabelece conexões aleatórias entre os roteadores, garantindo que a rede seja pelo menos parcialmente conectada
-3. Configura os endereços IP e rotas estáticas iniciais
-4. Gera o arquivo `docker-compose.yml` com toda a configuração necessária
+1. Criam múltiplas subredes, cada uma com 2 hosts e 1 roteador
+2. Estabelecem conexões entre os roteadores de acordo com a topologia escolhida
+3. Configuram os endereços IP e rotas estáticas iniciais
+4. Geram o arquivo `docker-compose.yml` com toda a configuração necessária
 
-A conectividade entre roteadores é garantida através de uma matriz de adjacência, onde cada roteador tem uma probabilidade de se conectar a outros roteadores. Isso simula uma rede real onde nem todos os roteadores estão diretamente conectados entre si.
+Cada topologia tem características específicas:
+- **Fila**: Cada roteador se conecta apenas aos adjacentes, formando uma linha
+- **Anel**: Similar à fila, mas o último roteador conecta-se ao primeiro, fechando um círculo
 
 ## Implementação do Algoritmo de Estado de Enlace
 
@@ -151,31 +264,14 @@ O sistema foi testado com diferentes configurações de rede:
 
 Resultados de performance:
 - O sistema mantém estabilidade com até 20 roteadores
-- A convergência da rede ocorre em menos de 30 segundos para redes pequenas (3-5 roteadores)
-- Para redes maiores (10-20 roteadores), a convergência pode levar até 2 minutos
-- O uso de CPU permanece abaixo de 30% mesmo com 20 roteadores
+- A convergência da rede ocorre em menos de 30 segundos para redes pequenas (5 roteadores)
+- Para redes maiores (10-20 roteadores), a convergência pode levar até 1 minuto no máximo.
+- O uso de CPU permanece em 100% mesmo com 10, 15 e 20 roteadores.
 
 ## Vantagens da Abordagem
 
 1. **Escalabilidade**: A arquitetura permite adicionar facilmente novos roteadores e hosts
-2. **Isolamento**: Cada elemento da rede roda em seu próprio container, garantindo isolamento
-3. **Flexibilidade**: A topologia pode ser facilmente modificada alterando os parâmetros do gerador
-4. **Visualização**: Scripts de teste facilitam a visualização do estado da rede
-5. **Automação**: O Makefile simplifica a execução de comandos comuns
+2. **Flexibilidade**: A topologia pode ser facilmente modificada alterando os parâmetros do gerador
+3. **Visualização**: Scripts de teste facilitam a visualização do estado da rede
+4. **Automação**: O Makefile simplifica a execução de comandos comuns
 
-## Desvantagens da Abordagem
-
-1. **Complexidade**: A implementação do algoritmo de estado de enlace é mais complexa que algoritmos de vetor de distância
-2. **Uso de recursos**: Cada roteador precisa manter uma LSDB completa, consumindo mais memória
-3. **Tempo de convergência**: Em redes grandes, pode levar mais tempo para convergir
-4. **Sensibilidade a falhas**: Mudanças frequentes na topologia podem causar instabilidade temporária
-
-## Conectividade entre Hosts
-
-Sim, qualquer host pode se comunicar com qualquer outro host na rede, desde que exista um caminho válido entre os roteadores que os conectam. O algoritmo de estado de enlace garante que cada roteador conheça o caminho mais eficiente para qualquer destino na rede.
-
-## Conclusão
-
-Este projeto demonstra a implementação prática do algoritmo de estado de enlace em uma rede simulada usando Docker e Python. A solução permite a comunicação eficiente entre hosts em diferentes subredes, com roteamento dinâmico baseado no algoritmo de Dijkstra.
-
-A escolha do UDP para comunicação entre roteadores, combinada com a implementação de threads para envio e recebimento de pacotes de estado de enlace, proporciona uma disseminação rápida de informações de roteamento, garantindo a convergência da rede mesmo em topologias complexas. 

@@ -1,6 +1,23 @@
+"""
+Gerador de Docker Compose para Topologia em Fila
+-----------------------------------------------
+Este script gera um arquivo docker-compose.yml configurando uma rede
+com topologia em fila, onde cada roteador se conecta apenas aos
+roteadores adjacentes formando uma linha.
+"""
+
 import yaml
 
 def generate_docker_compose(num_subnets):
+    """
+    Gera a configuração do Docker Compose para a topologia em fila.
+    
+    Args:
+        num_subnets (int): Número de subredes (e consequentemente, de roteadores)
+        
+    Returns:
+        dict: Configuração completa para o docker-compose.yml
+    """
     docker_compose = {
         'services': {},
         'networks': {}
@@ -84,10 +101,21 @@ def generate_docker_compose(num_subnets):
     return docker_compose
 
 def save_to_file(data, filename):
+    """
+    Salva a configuração gerada em um arquivo YAML.
+    
+    Args:
+        data (dict): Configuração do Docker Compose
+        filename (str): Nome do arquivo a ser criado
+    """
     with open(filename, 'w') as file:
         yaml.dump(data, file, default_flow_style=False, sort_keys=False)
 
 if __name__ == "__main__":
+    """
+    Ponto de entrada do script. Solicita o número de subredes ao usuário
+    e gera o arquivo docker-compose.yml com a topologia em fila.
+    """
     try:
         num_subnets = int(input("Digite o número de sub-redes: "))
         if num_subnets < 1:

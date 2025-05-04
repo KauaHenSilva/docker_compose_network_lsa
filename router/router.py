@@ -1,9 +1,9 @@
 """
-Implementação de roteador com algoritmo de estado de enlace.
-
+Implementação de Roteador com Algoritmo de Estado de Enlace
+----------------------------------------------------------
 Este módulo contém toda a lógica necessária para implementar
 um roteador utilizando o algoritmo de estado de enlace (Link State)
-para determinar as melhores rotas.
+para determinar as melhores rotas em uma rede de computadores.
 """
 
 import json
@@ -144,12 +144,13 @@ class NetworkInterface:
         Obtém todas as rotas existentes no sistema e compara com as novas rotas.
         
         Args:
-            rotas: Dicionário com as novas rotas a serem configuradas (destino -> próximo_salto)
+            rotas (Dict[str, str]): Dicionário com as novas rotas a serem configuradas (destino -> próximo_salto)
         
         Returns:
-            Dicionário com as novas rotas a serem adicionadas
-            Dicionário com as rotas a serem removidas
-            Dicionário com as rotas a serem substituídas
+            Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]: 
+                - Dicionário com as novas rotas a serem adicionadas
+                - Dicionário com as rotas a serem removidas
+                - Dicionário com as rotas a serem substituídas
         """
         rotas_existentes = {}
         rotas_sistema = {}
@@ -208,7 +209,7 @@ class NetworkInterface:
         
         except Exception as e:
             Logger.log(f"Erro ao obter rotas existentes: {e}")
-            return {}, {}
+            return {}, {}, {}
         
     @staticmethod
     def adicionar_interface(destino: str, proximo_salto: str):
@@ -216,11 +217,11 @@ class NetworkInterface:
         Configura a interface de rede para o próximo salto.
         
         Args:
-            destino: Endereço IP de destino -> 172.21.8.3
-            proximo_salto: Endereço IP do próximo salto -> exemplo: 172.21.1.3
+            destino (str): Endereço IP de destino (exemplo: 172.21.8.3)
+            proximo_salto (str): Endereço IP do próximo salto (exemplo: 172.21.1.3)
             
         Returns:
-            True se a configuração foi bem sucedida, False caso contrário
+            bool: True se a configuração foi bem sucedida, False caso contrário
         """
         try:
             parts = destino.split('.')
@@ -247,7 +248,7 @@ class NetworkInterface:
         Remove a configuração da interface de rede.
         
         Args:
-            destino: Endereço IP de destino
+            destino (str): Endereço IP de destino a ser removido da tabela de roteamento
         """
         try:
             process = subprocess.run(["ip", "route", "del", destino], check=True)
@@ -262,10 +263,11 @@ class NetworkInterface:
             
     def salvar_lsdb_rotas_arquivo(lsdb: Dict[str, Any], rotas: Dict[str, str]) -> None:
         """
-        Salva a LSDB em um arquivo JSON.
+        Salva a LSDB e tabela de rotas em arquivos JSON.
         
         Args:
-            lsdb: Dicionário com a LSDB
+            lsdb (Dict[str, Any]): Dicionário com a base de dados de estado de enlace
+            rotas (Dict[str, str]): Dicionário com a tabela de rotas
         """
         try:
             with open("lsdb.json", "w") as file:
@@ -279,11 +281,11 @@ class NetworkInterface:
             
     def replase_interface(destino: str, proximo_salto: str) -> None:
         """
-        Replase a configuração da interface de rede.
+        Substitui a configuração existente de interface de rede.
         
         Args:
-            destino: Endereço IP de destino
-            proximo_salto: Endereço IP do próximo salto
+            destino (str): Endereço IP de destino
+            proximo_salto (str): Novo endereço IP do próximo salto
         """
         try:
             parts = destino.split('.')
@@ -303,6 +305,13 @@ class NetworkInterface:
     
     @staticmethod
     def config_interface(lsdb: Dict[str, Any], vizinhos: Dict[str, Tuple[str, int]]) -> None:
+        """
+        Configura as interfaces de rede com base na LSDB e vizinhos ativos.
+        
+        Args:
+            lsdb (Dict[str, Any]): Base de dados de estado de enlace
+            vizinhos (Dict[str, Tuple[str, int]]): Dicionário de vizinhos ativos
+        """
         rotas = dijkstra(ROTEADOR_IP, lsdb)
         NetworkInterface.salvar_lsdb_rotas_arquivo(lsdb, rotas)
         

@@ -1,26 +1,23 @@
 """
-Utilitários para formatação de dados usados pelo roteador.
+Utilitários para Formatação de Dados do Roteador
+-----------------------------------------------
+Este módulo fornece funções e classes para formatação de dados
+utilizados pelo roteador na implementação do algoritmo de estado de enlace.
 """
 
 class Formatter:
-    """Classe para formatação de dados."""
+    """Classe para formatação de dados do roteador."""
     
     @staticmethod
     def formatar_vizinhos(vizinhos_str: str) -> dict[str, tuple[str, int]]:
         """
-        Formata a string de vizinhos em um dicionário.
-        
-        Recebe: "[router1, 172.20.1.2, 1],[router3, 172.20.3.2, 1]"
-        retorna: {
-            "router1": ("172.20.1.2", 1),
-            "router3": ("172.20.3.2", 1)
-        }
+        Formata a string de vizinhos em um dicionário estruturado.
         
         Args:
-            vizinhos_str: String no formato "[router1, 172.20.1.2, 1],[router3, 172.20.3.2, 1]"
+            vizinhos_str (str): String no formato "[router1, 172.20.1.2, 1],[router3, 172.20.3.2, 1]"
             
         Returns:
-            Dicionário formatado com vizinhos
+            dict: Dicionário formatado com vizinhos no formato {nome: (ip, custo)}
         """
         vizinhos_dict = {}
         if not vizinhos_str:

@@ -1,18 +1,35 @@
+"""
+Implementação do Algoritmo de Dijkstra para Roteamento de Rede
+--------------------------------------------------------------
+Este módulo fornece funcionalidade para calcular o caminho mais curto
+entre roteadores de rede usando o algoritmo de Dijkstra. Ele processa
+um Banco de Dados de Estado de Link (LSDB) para gerar tabelas de roteamento.
+"""
+
 import json
 
 def dijkstra(origem, lsdb):
-    # 1. Monta o grafo, mas só incluindo vizinhos com LSA presente
+    """
+    Implementa o algoritmo de Dijkstra para calcular os caminhos mais curtos de um roteador de origem
+    para todos os outros roteadores na rede.
+    
+    Args:
+        origem (str): O endereço IP do roteador de origem
+        lsdb (dict): Banco de Dados de Estado de Link contendo informações sobre todos os roteadores
+                     e suas conexões com custos
+    
+    Returns:
+        dict: Uma tabela de roteamento mapeando endereços IP de destino para endereços IP de próximo salto
+    """
     grafo = {}
     for router_id, lsa in lsdb.items():
         vizinhos = {}
         for viz_entry in lsa["vizinhos"].values():
             ip_viz, custo = viz_entry
-            # só adiciona se esse vizinho já tiver LSA no lsdb
             if ip_viz in lsdb:
                 vizinhos[ip_viz] = custo
         grafo[router_id] = vizinhos
 
-    # 2. Inicializa Dijkstra
     dist = {r: float('inf') for r in grafo}
     prev = {r: None for r in grafo}
     dist[origem] = 0
@@ -22,12 +39,10 @@ def dijkstra(origem, lsdb):
         u = min((r for r in grafo if r not in visitados), key=lambda r: dist[r])
         visitados.add(u)
         for v, custo in grafo[u].items():
-            # agora v sempre estará em dist
             if dist[u] + custo < dist[v]:
                 dist[v] = dist[u] + custo
                 prev[v] = u
 
-    # 3. Monta tabela de rotas
     tabela = {}
     for destino in grafo:
         if destino == origem or prev[destino] is None:
@@ -114,5 +129,4 @@ if __name__ == "__main__":
         }
     }
 
-    # print("LSDB:", json.dumps(lsdb, indent=2))
     print(dijkstra("172.20.1.3", lsdb))

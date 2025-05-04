@@ -1,6 +1,23 @@
+"""
+Gerador de Docker Compose para Topologia em Anel
+-----------------------------------------------
+Este script gera um arquivo docker-compose.yml configurando uma rede
+com topologia em anel (circular), onde cada roteador se conecta aos
+roteadores adjacentes, fechando um círculo completo.
+"""
+
 import yaml
 
 def generate_docker_compose(num_subnets):
+    """
+    Gera a configuração do Docker Compose para a topologia em anel.
+    
+    Args:
+        num_subnets (int): Número de subredes (e consequentemente, de roteadores)
+        
+    Returns:
+        dict: Configuração completa para o docker-compose.yml
+    """
     docker_compose = {
         'services': {},
         'networks': {}
@@ -28,6 +45,7 @@ def generate_docker_compose(num_subnets):
         vizinhos = []
         networks = {}
         
+        # Conexão adicional para fechar o círculo
         if i == 1:
             vizinhos.append(f"[router{num_subnets}, 172.20.{num_subnets}.3, 1]")
             networks[f"subnet_{num_subnets}"] = {
@@ -39,6 +57,7 @@ def generate_docker_compose(num_subnets):
                 'ipv4_address': f'172.20.1.4'
             }
         
+        # Conexões com vizinhos adjacentes
         if i > 1:
             vizinhos.append(f"[router{i-1}, 172.20.{i-1}.3, 1]")
             networks[f"subnet_{i-1}"] = {
@@ -95,10 +114,21 @@ def generate_docker_compose(num_subnets):
     return docker_compose
 
 def save_to_file(data, filename):
+    """
+    Salva a configuração gerada em um arquivo YAML.
+    
+    Args:
+        data (dict): Configuração do Docker Compose
+        filename (str): Nome do arquivo a ser criado
+    """
     with open(filename, 'w') as file:
         yaml.dump(data, file, default_flow_style=False, sort_keys=False)
 
 if __name__ == "__main__":
+    """
+    Ponto de entrada do script. Solicita o número de subredes ao usuário
+    e gera o arquivo docker-compose.yml com a topologia em anel.
+    """
     try:
         num_subnets = int(input("Digite o número de sub-redes: "))
         if num_subnets < 1:
