@@ -18,8 +18,8 @@ from dycastra import dijkstra
 
 ROTEADOR_IP = os.getenv("my_ip")
 ROTEADOR_NAME = os.getenv('my_name')
-
 VIZINHOS = Formatter.formatar_vizinhos(os.getenv("vizinhos"))
+
 PORTA_LSA = 5000
 
 class Logger:
@@ -40,13 +40,14 @@ class NetworkUtils:
     """Classe para utilitários de rede."""
     
     @staticmethod
-    def _testar_ping(ip: str) -> Tuple[bool, float]:
+    def _testar_ping(ip: str, result: Dict[str, Tuple[bool, float]], treadlock: threading.Lock) -> None:
         """
         Testa a conectividade com um IP via ping.
         
         Args:
             ip: Endereço IP a ser testado
-            
+            result: Dicionário para armazenar os resultados do ping
+
         Returns:
             True se ping bem sucedido, False caso contrário
         """
@@ -61,10 +62,11 @@ class NetworkUtils:
             end_ping = time.time()
             is_alive = process.returncode == 0
         except Exception:
-            return False, 0.0
-        
-        tempo_ping = end_ping - init_ping
-        return is_alive, tempo_ping
+            ...
+            
+        with treadlock:
+            tempo_ping = end_ping - init_ping   
+            result[ip] = (is_alive, tempo_ping)
 
     
     @staticmethod
@@ -79,13 +81,24 @@ class NetworkUtils:
             Dicionário de vizinhos ativos (nome, ip)
         """
         vizinhos_ativos = {}
+        threads = []
+        result = {}
+        treadlock = threading.Lock()
+        
         for viz, (ip, ant_custo) in vizinhos.items():
-            is_alive, tempo_ping = NetworkUtils._testar_ping(ip)
+            thread = threading.Thread(target=NetworkUtils._testar_ping, args=(ip, result, treadlock))
+            thread.daemon = True
+            thread.start()
+            threads.append((viz, ip, thread))
+
+        for viz, ip, thread in threads:
+            thread.join()
+            is_alive, tempo_ping = result[ip]
             if is_alive:
                 vizinhos_ativos[viz] = (ip, tempo_ping)
             else:
-                # Logger.log(f"Ping falhou para {viz} ({ip})")
                 ...
+            
         return vizinhos_ativos
 
 class LSAHandler:
@@ -270,12 +283,10 @@ class NetworkInterface:
             rotas (Dict[str, str]): Dicionário com a tabela de rotas
         """
         try:
-            with open("lsdb.json", "w") as file:
+            with open(f"lsdb/lsdb_{ROTEADOR_NAME}.json", "w") as file:
                 json.dump(lsdb, file, indent=4)
-            # Logger.log("LSDB salva em lsdb.json")
-            with open("rotas.json", "w") as file:
+            with open(f"rotas/rotas_{ROTEADOR_NAME}.json", "w") as file:
                 json.dump(rotas, file, indent=4)
-            # Logger.log("Rotas salvas em rotas.json")
         except Exception as e:
             Logger.log(f"Erro ao salvar LSDB: {e}")
             
@@ -423,6 +434,12 @@ class Router:
         
     def iniciar(self) -> None:
         """Inicia as threads do roteador."""
+        
+        while True:
+            with open("start.txt", 'r') as file:
+                if file.read().strip() == "start":
+                    break
+        
         threads = [
             threading.Thread(target=self.thread_enviar_lsa, daemon=True, name="enviar_lsa"),
             threading.Thread(target=self.thread_receber_lsa, daemon=True, name="receber_lsa"),

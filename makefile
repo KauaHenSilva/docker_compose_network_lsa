@@ -1,6 +1,13 @@
 up:
-	@docker compose down
-	@docker compose up --build
+	@docker compose down --remove-orphans
+	@echo "start" > router/start.txt
+	@docker compose up
+
+up_background:
+	@echo "" > router/start.txt
+	@docker compose down --remove-orphans
+	@docker compose up -d
+	@echo "start" > router/start.txt
 
 ger_fila:
 	@python3 docker_compose_ger_fila.py
@@ -9,10 +16,14 @@ ger_enu:
 	@python3 docker_compose_ger_enu.py
 
 ger_cir:
+	@python3 docker_compose_ger_cir.py $(qtd)
+
+ger_cir_with_parames:
 	@python3 docker_compose_ger_cir.py
 
 down:
-	@docker compose down
+	@docker compose down --remove-orphans
+	@echo "" > router/start.txt
 
 clear:
 	@docker compose down --rmi all --volumes --remove-orphans
@@ -29,3 +40,9 @@ user-connect-router:
 
 user-connect-user:
 	@python3 scripts_test/user_connect_user.py
+
+test_time_conversion:
+	@python3 scripts_test/test_time_conversion.py
+
+test_qtd_packets:
+	@python3 scripts_test/test_qtd_packets.py

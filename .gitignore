@@ -1,2 +1,6 @@
 .venv
 docker-compose.yml
+router/lsdb
+router/rotas
+router/start.txt
+dados_convergencia

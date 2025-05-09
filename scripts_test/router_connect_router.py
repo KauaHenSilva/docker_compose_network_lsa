@@ -88,10 +88,6 @@ def main():
     lock_thread = threading.Lock()
 
     for frm, to, ip in tasks:
-        while len(threads) >= MAX_WORKERS:
-            threads = [thr for thr in threads if thr.is_alive()]
-            time.sleep(0.01)
-
         thread = threading.Thread(target=ping_task, args=(frm, to, ip, results, lock_thread))
         thread.start()
         threads.append(thread)

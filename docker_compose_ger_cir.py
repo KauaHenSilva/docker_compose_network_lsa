@@ -7,6 +7,7 @@ roteadores adjacentes, fechando um círculo completo.
 """
 
 import yaml
+import sys
 
 def generate_docker_compose(num_subnets):
     """
@@ -79,6 +80,9 @@ def generate_docker_compose(num_subnets):
                 'context': './router',
                 'dockerfile': 'Dockerfile'
             },
+            'volumes': [
+                './router:/app'
+            ],
             'environment': [
                 f"vizinhos={','. join(vizinhos)}",
                 f"my_ip={my_ip}",
@@ -105,7 +109,7 @@ def generate_docker_compose(num_subnets):
                     }
                 },
                 'depends_on': [f'router{i}'],
-                'command': f'/bin/bash -c "ip route del default && ip route add default via {my_ip} dev eth0 && python host.py"',
+                'command': f'/bin/bash -c "ip route del default && ip route add default via {my_ip} dev eth0 && sleep infinity"',
                 'cap_add': [
                     'NET_ADMIN'
                 ]
@@ -130,7 +134,8 @@ if __name__ == "__main__":
     e gera o arquivo docker-compose.yml com a topologia em anel.
     """
     try:
-        num_subnets = int(input("Digite o número de sub-redes: "))
+        args = sys.argv[1:]
+        num_subnets = int(args[0]) if args else int(input("Digite o número de sub-redes: "))
         if num_subnets < 1:
             raise ValueError("Deve haver pelo menos 1 sub-rede")
 
