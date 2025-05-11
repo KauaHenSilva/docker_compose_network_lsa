@@ -7,6 +7,7 @@ do estado da rede.
 """
 
 import sys
+import psutil
 import os
 import threading
 import time
@@ -62,17 +63,17 @@ def get_packet_stats(container, t_qtd_pacotes_recebidos, t_qtd_pacotes_enviados,
         t_qtd_pacotes_enviados.append(qtd_pacotes_enviados)
         
         
-def incluir_cabecalho():
+def incluir_cabecalho(if_test):
     """
     Cria o arquivo CSV e inclui o cabeçalho.
     """
-    if not os.path.exists("dados_convergencia/resultados.csv"):
+    if not os.path.exists(f"dados_convergencia/{if_test}.csv"):
         os.makedirs("dados_convergencia", exist_ok=True)
-        with open("dados_convergencia/resultados.csv", "w") as file:
+        with open(f"dados_convergencia/{if_test}.csv", "w") as file:
             file.write("qtd_roteadores,tempo_convergencia,soma_rx,mediana_rx,soma_tx,mediana_tx\n")
 
-def incluir_resultados(qtd_roteadores, tempo_convergencia, soma_rx, mediana_rx, soma_tx, mediana_tx):
-    with open("dados_convergencia/resultados.csv", "a") as file:
+def incluir_resultados(qtd_roteadores, tempo_convergencia, soma_rx, mediana_rx, soma_tx, mediana_tx, if_test):
+    with open(f"dados_convergencia/{if_test}.csv", "a") as file:
         file.write(f"{qtd_roteadores},{tempo_convergencia},{soma_rx},{mediana_rx},{soma_tx},{mediana_tx}\n")
     
 
@@ -81,12 +82,26 @@ def main():
     Função principal que obtém e exibe as tabelas de roteamento de todos os roteadores.
     Cada tabela é exibida com formatação colorida para facilitar a leitura.
     """
+
+    qtd_maxima_roteadores_para_test = 100
+    qtd_inicial = 10
+    qtd_pulo = 10
     
-    incluir_cabecalho()
+    total_cpus = os.cpu_count()
+    total_memory = psutil.virtual_memory().total // (1024 * 1024)
+
+    max_cpus = total_cpus * 0.8
+    max_memory = total_memory * 0.8
     
-    for qtd in range(10, 120, 10):
+    cpu_per_container = max_cpus / ( qtd_maxima_roteadores_para_test)
+    mem_per_container = f"{int(max_memory / (qtd_maxima_roteadores_para_test))}M"
+    
+    if_test = f"{(cpu_per_container)}_{mem_per_container}_{qtd_maxima_roteadores_para_test}"
+    incluir_cabecalho(if_test)
+    
+    for qtd in range(qtd_inicial, qtd_maxima_roteadores_para_test + 1, qtd_pulo):
         print(f"{Colors.YELLOW}Iniciando teste com {qtd} roteadores...{Colors.NC}", end='\n\n')
-        os.system(f"make ger_cir qtd={qtd} > /dev/null 2>&1")
+        os.system(f"make ger_cir qtd={qtd} with_host=0 qtd_max_test={qtd_maxima_roteadores_para_test} > /dev/null 2>&1")
         os.system("make down > /dev/null 2>&1")
         
         os.system("make up_background > /dev/null 2>&1")
@@ -133,7 +148,7 @@ def main():
         print(f"{Colors.GREEN}Pacotes Enviados  (total): {soma_tx}, Mediana: {mediana_tx}{Colors.NC}")
         print()
 
-        incluir_resultados(qtd_routers, tempo_convergencia, soma_rx, mediana_rx, soma_tx, mediana_tx)
+        incluir_resultados(qtd_routers, tempo_convergencia, soma_rx, mediana_rx, soma_tx, mediana_tx, if_test)
 
 
 if __name__ == "__main__":

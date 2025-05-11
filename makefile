@@ -13,13 +13,10 @@ ger_fila:
 	@python3 docker_compose_ger_fila.py
 
 ger_enu:
-	@python3 docker_compose_ger_enu.py
+	@python3 docker_compose_ger_enu.py 
 
 ger_cir:
-	@python3 docker_compose_ger_cir.py $(qtd)
-
-ger_cir_with_parames:
-	@python3 docker_compose_ger_cir.py
+	@python3 docker_compose_ger_cir.py $(qtd) ${with_host} ${qtd_max_test}
 
 down:
 	@docker compose down --remove-orphans
