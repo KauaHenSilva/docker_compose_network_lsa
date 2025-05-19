@@ -36,11 +36,6 @@ def get_routing_table(container, qtd_routers):
         if qtd_connexao == qtd_routers + 1:
             break
 
-def init_routers():
-    """
-    Inicializa os roteadores, derrubando e reiniciando os containers.
-    """
-
 def get_packet_stats(container, t_qtd_pacotes_recebidos, t_qtd_pacotes_enviados, lock_thread):
     cmd = f"docker exec {container} cat /proc/net/dev"
     output = os.popen(cmd).read()
@@ -61,7 +56,6 @@ def get_packet_stats(container, t_qtd_pacotes_recebidos, t_qtd_pacotes_enviados,
     with lock_thread:
         t_qtd_pacotes_recebidos.append(qtd_pacotes_recebidos)
         t_qtd_pacotes_enviados.append(qtd_pacotes_enviados)
-        
         
 def incluir_cabecalho(if_test):
     """

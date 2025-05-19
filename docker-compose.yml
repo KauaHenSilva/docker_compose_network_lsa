@@ -6,12 +6,12 @@ services:
     volumes:
     - ./router:/app
     environment:
-    - vizinhos=[router100, 172.20.100.3, 1],[router2, 172.20.2.3, 1]
+    - vizinhos=[router10, 172.20.10.3, 1],[router2, 172.20.2.3, 1]
     - my_ip=172.20.1.3
     - my_name=router1
     networks:
-      subnet_100:
-        ipv4_address: 172.20.100.2
+      subnet_10:
+        ipv4_address: 172.20.10.2
       subnet_2:
         ipv4_address: 172.20.2.4
       subnet_1:
@@ -20,8 +20,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host10:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_1:
+        ipv4_address: 172.20.1.10
+    depends_on:
+    - router1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host11:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_1:
+        ipv4_address: 172.20.1.11
+    depends_on:
+    - router1
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router2:
     build:
       context: ./router
@@ -43,8 +73,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host20:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_2:
+        ipv4_address: 172.20.2.10
+    depends_on:
+    - router2
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host21:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_2:
+        ipv4_address: 172.20.2.11
+    depends_on:
+    - router2
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.2.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router3:
     build:
       context: ./router
@@ -66,8 +126,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host30:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_3:
+        ipv4_address: 172.20.3.10
+    depends_on:
+    - router3
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host31:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_3:
+        ipv4_address: 172.20.3.11
+    depends_on:
+    - router3
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.3.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router4:
     build:
       context: ./router
@@ -89,8 +179,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host40:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_4:
+        ipv4_address: 172.20.4.10
+    depends_on:
+    - router4
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host41:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_4:
+        ipv4_address: 172.20.4.11
+    depends_on:
+    - router4
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.4.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router5:
     build:
       context: ./router
@@ -112,8 +232,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host50:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_5:
+        ipv4_address: 172.20.5.10
+    depends_on:
+    - router5
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host51:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_5:
+        ipv4_address: 172.20.5.11
+    depends_on:
+    - router5
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.5.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router6:
     build:
       context: ./router
@@ -135,8 +285,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.6.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host60:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_6:
+        ipv4_address: 172.20.6.10
+    depends_on:
+    - router6
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.6.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host61:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_6:
+        ipv4_address: 172.20.6.11
+    depends_on:
+    - router6
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.6.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router7:
     build:
       context: ./router
@@ -158,8 +338,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.7.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host70:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_7:
+        ipv4_address: 172.20.7.10
+    depends_on:
+    - router7
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.7.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host71:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_7:
+        ipv4_address: 172.20.7.11
+    depends_on:
+    - router7
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.7.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router8:
     build:
       context: ./router
@@ -181,8 +391,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.8.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host80:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_8:
+        ipv4_address: 172.20.8.10
+    depends_on:
+    - router8
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.8.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host81:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_8:
+        ipv4_address: 172.20.8.11
+    depends_on:
+    - router8
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.8.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router9:
     build:
       context: ./router
@@ -204,8 +444,38 @@ services:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.9.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host90:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_9:
+        ipv4_address: 172.20.9.10
+    depends_on:
+    - router9
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.9.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host91:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    networks:
+      subnet_9:
+        ipv4_address: 172.20.9.11
+    depends_on:
+    - router9
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.9.3
+      dev eth0 && sleep infinity"
+    cap_add:
+    - NET_ADMIN
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
   router10:
     build:
       context: ./router
@@ -213,2092 +483,52 @@ services:
     volumes:
     - ./router:/app
     environment:
-    - vizinhos=[router9, 172.20.9.3, 1],[router11, 172.20.11.3, 1]
+    - vizinhos=[router1, 172.20.1.3, 1],[router9, 172.20.9.3, 1]
     - my_ip=172.20.10.3
     - my_name=router10
     networks:
+      subnet_1:
+        ipv4_address: 172.20.1.4
       subnet_9:
         ipv4_address: 172.20.9.2
-      subnet_11:
-        ipv4_address: 172.20.11.4
       subnet_10:
         ipv4_address: 172.20.10.3
     cap_add:
     - NET_ADMIN
     command: /bin/bash -c "ip route del default && ip route add default via 172.20.10.3
       && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router11:
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host100:
     build:
-      context: ./router
+      context: ./host
       dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router10, 172.20.10.3, 1],[router12, 172.20.12.3, 1]
-    - my_ip=172.20.11.3
-    - my_name=router11
     networks:
       subnet_10:
-        ipv4_address: 172.20.10.2
-      subnet_12:
-        ipv4_address: 172.20.12.4
-      subnet_11:
-        ipv4_address: 172.20.11.3
+        ipv4_address: 172.20.10.10
+    depends_on:
+    - router10
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.10.3
+      dev eth0 && sleep infinity"
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.11.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router12:
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+  host101:
     build:
-      context: ./router
+      context: ./host
       dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router11, 172.20.11.3, 1],[router13, 172.20.13.3, 1]
-    - my_ip=172.20.12.3
-    - my_name=router12
     networks:
-      subnet_11:
-        ipv4_address: 172.20.11.2
-      subnet_13:
-        ipv4_address: 172.20.13.4
-      subnet_12:
-        ipv4_address: 172.20.12.3
+      subnet_10:
+        ipv4_address: 172.20.10.11
+    depends_on:
+    - router10
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.10.3
+      dev eth0 && sleep infinity"
     cap_add:
     - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.12.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router13:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router12, 172.20.12.3, 1],[router14, 172.20.14.3, 1]
-    - my_ip=172.20.13.3
-    - my_name=router13
-    networks:
-      subnet_12:
-        ipv4_address: 172.20.12.2
-      subnet_14:
-        ipv4_address: 172.20.14.4
-      subnet_13:
-        ipv4_address: 172.20.13.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.13.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router14:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router13, 172.20.13.3, 1],[router15, 172.20.15.3, 1]
-    - my_ip=172.20.14.3
-    - my_name=router14
-    networks:
-      subnet_13:
-        ipv4_address: 172.20.13.2
-      subnet_15:
-        ipv4_address: 172.20.15.4
-      subnet_14:
-        ipv4_address: 172.20.14.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.14.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router15:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router14, 172.20.14.3, 1],[router16, 172.20.16.3, 1]
-    - my_ip=172.20.15.3
-    - my_name=router15
-    networks:
-      subnet_14:
-        ipv4_address: 172.20.14.2
-      subnet_16:
-        ipv4_address: 172.20.16.4
-      subnet_15:
-        ipv4_address: 172.20.15.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.15.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router16:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router15, 172.20.15.3, 1],[router17, 172.20.17.3, 1]
-    - my_ip=172.20.16.3
-    - my_name=router16
-    networks:
-      subnet_15:
-        ipv4_address: 172.20.15.2
-      subnet_17:
-        ipv4_address: 172.20.17.4
-      subnet_16:
-        ipv4_address: 172.20.16.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.16.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router17:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router16, 172.20.16.3, 1],[router18, 172.20.18.3, 1]
-    - my_ip=172.20.17.3
-    - my_name=router17
-    networks:
-      subnet_16:
-        ipv4_address: 172.20.16.2
-      subnet_18:
-        ipv4_address: 172.20.18.4
-      subnet_17:
-        ipv4_address: 172.20.17.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.17.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router18:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router17, 172.20.17.3, 1],[router19, 172.20.19.3, 1]
-    - my_ip=172.20.18.3
-    - my_name=router18
-    networks:
-      subnet_17:
-        ipv4_address: 172.20.17.2
-      subnet_19:
-        ipv4_address: 172.20.19.4
-      subnet_18:
-        ipv4_address: 172.20.18.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.18.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router19:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router18, 172.20.18.3, 1],[router20, 172.20.20.3, 1]
-    - my_ip=172.20.19.3
-    - my_name=router19
-    networks:
-      subnet_18:
-        ipv4_address: 172.20.18.2
-      subnet_20:
-        ipv4_address: 172.20.20.4
-      subnet_19:
-        ipv4_address: 172.20.19.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.19.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router20:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router19, 172.20.19.3, 1],[router21, 172.20.21.3, 1]
-    - my_ip=172.20.20.3
-    - my_name=router20
-    networks:
-      subnet_19:
-        ipv4_address: 172.20.19.2
-      subnet_21:
-        ipv4_address: 172.20.21.4
-      subnet_20:
-        ipv4_address: 172.20.20.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.20.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router21:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router20, 172.20.20.3, 1],[router22, 172.20.22.3, 1]
-    - my_ip=172.20.21.3
-    - my_name=router21
-    networks:
-      subnet_20:
-        ipv4_address: 172.20.20.2
-      subnet_22:
-        ipv4_address: 172.20.22.4
-      subnet_21:
-        ipv4_address: 172.20.21.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.21.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router22:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router21, 172.20.21.3, 1],[router23, 172.20.23.3, 1]
-    - my_ip=172.20.22.3
-    - my_name=router22
-    networks:
-      subnet_21:
-        ipv4_address: 172.20.21.2
-      subnet_23:
-        ipv4_address: 172.20.23.4
-      subnet_22:
-        ipv4_address: 172.20.22.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.22.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router23:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router22, 172.20.22.3, 1],[router24, 172.20.24.3, 1]
-    - my_ip=172.20.23.3
-    - my_name=router23
-    networks:
-      subnet_22:
-        ipv4_address: 172.20.22.2
-      subnet_24:
-        ipv4_address: 172.20.24.4
-      subnet_23:
-        ipv4_address: 172.20.23.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.23.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router24:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router23, 172.20.23.3, 1],[router25, 172.20.25.3, 1]
-    - my_ip=172.20.24.3
-    - my_name=router24
-    networks:
-      subnet_23:
-        ipv4_address: 172.20.23.2
-      subnet_25:
-        ipv4_address: 172.20.25.4
-      subnet_24:
-        ipv4_address: 172.20.24.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.24.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router25:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router24, 172.20.24.3, 1],[router26, 172.20.26.3, 1]
-    - my_ip=172.20.25.3
-    - my_name=router25
-    networks:
-      subnet_24:
-        ipv4_address: 172.20.24.2
-      subnet_26:
-        ipv4_address: 172.20.26.4
-      subnet_25:
-        ipv4_address: 172.20.25.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.25.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router26:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router25, 172.20.25.3, 1],[router27, 172.20.27.3, 1]
-    - my_ip=172.20.26.3
-    - my_name=router26
-    networks:
-      subnet_25:
-        ipv4_address: 172.20.25.2
-      subnet_27:
-        ipv4_address: 172.20.27.4
-      subnet_26:
-        ipv4_address: 172.20.26.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.26.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router27:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router26, 172.20.26.3, 1],[router28, 172.20.28.3, 1]
-    - my_ip=172.20.27.3
-    - my_name=router27
-    networks:
-      subnet_26:
-        ipv4_address: 172.20.26.2
-      subnet_28:
-        ipv4_address: 172.20.28.4
-      subnet_27:
-        ipv4_address: 172.20.27.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.27.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router28:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router27, 172.20.27.3, 1],[router29, 172.20.29.3, 1]
-    - my_ip=172.20.28.3
-    - my_name=router28
-    networks:
-      subnet_27:
-        ipv4_address: 172.20.27.2
-      subnet_29:
-        ipv4_address: 172.20.29.4
-      subnet_28:
-        ipv4_address: 172.20.28.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.28.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router29:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router28, 172.20.28.3, 1],[router30, 172.20.30.3, 1]
-    - my_ip=172.20.29.3
-    - my_name=router29
-    networks:
-      subnet_28:
-        ipv4_address: 172.20.28.2
-      subnet_30:
-        ipv4_address: 172.20.30.4
-      subnet_29:
-        ipv4_address: 172.20.29.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.29.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router30:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router29, 172.20.29.3, 1],[router31, 172.20.31.3, 1]
-    - my_ip=172.20.30.3
-    - my_name=router30
-    networks:
-      subnet_29:
-        ipv4_address: 172.20.29.2
-      subnet_31:
-        ipv4_address: 172.20.31.4
-      subnet_30:
-        ipv4_address: 172.20.30.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.30.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router31:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router30, 172.20.30.3, 1],[router32, 172.20.32.3, 1]
-    - my_ip=172.20.31.3
-    - my_name=router31
-    networks:
-      subnet_30:
-        ipv4_address: 172.20.30.2
-      subnet_32:
-        ipv4_address: 172.20.32.4
-      subnet_31:
-        ipv4_address: 172.20.31.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.31.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router32:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router31, 172.20.31.3, 1],[router33, 172.20.33.3, 1]
-    - my_ip=172.20.32.3
-    - my_name=router32
-    networks:
-      subnet_31:
-        ipv4_address: 172.20.31.2
-      subnet_33:
-        ipv4_address: 172.20.33.4
-      subnet_32:
-        ipv4_address: 172.20.32.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.32.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router33:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router32, 172.20.32.3, 1],[router34, 172.20.34.3, 1]
-    - my_ip=172.20.33.3
-    - my_name=router33
-    networks:
-      subnet_32:
-        ipv4_address: 172.20.32.2
-      subnet_34:
-        ipv4_address: 172.20.34.4
-      subnet_33:
-        ipv4_address: 172.20.33.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.33.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router34:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router33, 172.20.33.3, 1],[router35, 172.20.35.3, 1]
-    - my_ip=172.20.34.3
-    - my_name=router34
-    networks:
-      subnet_33:
-        ipv4_address: 172.20.33.2
-      subnet_35:
-        ipv4_address: 172.20.35.4
-      subnet_34:
-        ipv4_address: 172.20.34.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.34.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router35:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router34, 172.20.34.3, 1],[router36, 172.20.36.3, 1]
-    - my_ip=172.20.35.3
-    - my_name=router35
-    networks:
-      subnet_34:
-        ipv4_address: 172.20.34.2
-      subnet_36:
-        ipv4_address: 172.20.36.4
-      subnet_35:
-        ipv4_address: 172.20.35.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.35.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router36:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router35, 172.20.35.3, 1],[router37, 172.20.37.3, 1]
-    - my_ip=172.20.36.3
-    - my_name=router36
-    networks:
-      subnet_35:
-        ipv4_address: 172.20.35.2
-      subnet_37:
-        ipv4_address: 172.20.37.4
-      subnet_36:
-        ipv4_address: 172.20.36.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.36.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router37:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router36, 172.20.36.3, 1],[router38, 172.20.38.3, 1]
-    - my_ip=172.20.37.3
-    - my_name=router37
-    networks:
-      subnet_36:
-        ipv4_address: 172.20.36.2
-      subnet_38:
-        ipv4_address: 172.20.38.4
-      subnet_37:
-        ipv4_address: 172.20.37.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.37.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router38:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router37, 172.20.37.3, 1],[router39, 172.20.39.3, 1]
-    - my_ip=172.20.38.3
-    - my_name=router38
-    networks:
-      subnet_37:
-        ipv4_address: 172.20.37.2
-      subnet_39:
-        ipv4_address: 172.20.39.4
-      subnet_38:
-        ipv4_address: 172.20.38.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.38.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router39:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router38, 172.20.38.3, 1],[router40, 172.20.40.3, 1]
-    - my_ip=172.20.39.3
-    - my_name=router39
-    networks:
-      subnet_38:
-        ipv4_address: 172.20.38.2
-      subnet_40:
-        ipv4_address: 172.20.40.4
-      subnet_39:
-        ipv4_address: 172.20.39.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.39.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router40:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router39, 172.20.39.3, 1],[router41, 172.20.41.3, 1]
-    - my_ip=172.20.40.3
-    - my_name=router40
-    networks:
-      subnet_39:
-        ipv4_address: 172.20.39.2
-      subnet_41:
-        ipv4_address: 172.20.41.4
-      subnet_40:
-        ipv4_address: 172.20.40.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.40.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router41:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router40, 172.20.40.3, 1],[router42, 172.20.42.3, 1]
-    - my_ip=172.20.41.3
-    - my_name=router41
-    networks:
-      subnet_40:
-        ipv4_address: 172.20.40.2
-      subnet_42:
-        ipv4_address: 172.20.42.4
-      subnet_41:
-        ipv4_address: 172.20.41.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.41.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router42:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router41, 172.20.41.3, 1],[router43, 172.20.43.3, 1]
-    - my_ip=172.20.42.3
-    - my_name=router42
-    networks:
-      subnet_41:
-        ipv4_address: 172.20.41.2
-      subnet_43:
-        ipv4_address: 172.20.43.4
-      subnet_42:
-        ipv4_address: 172.20.42.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.42.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router43:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router42, 172.20.42.3, 1],[router44, 172.20.44.3, 1]
-    - my_ip=172.20.43.3
-    - my_name=router43
-    networks:
-      subnet_42:
-        ipv4_address: 172.20.42.2
-      subnet_44:
-        ipv4_address: 172.20.44.4
-      subnet_43:
-        ipv4_address: 172.20.43.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.43.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router44:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router43, 172.20.43.3, 1],[router45, 172.20.45.3, 1]
-    - my_ip=172.20.44.3
-    - my_name=router44
-    networks:
-      subnet_43:
-        ipv4_address: 172.20.43.2
-      subnet_45:
-        ipv4_address: 172.20.45.4
-      subnet_44:
-        ipv4_address: 172.20.44.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.44.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router45:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router44, 172.20.44.3, 1],[router46, 172.20.46.3, 1]
-    - my_ip=172.20.45.3
-    - my_name=router45
-    networks:
-      subnet_44:
-        ipv4_address: 172.20.44.2
-      subnet_46:
-        ipv4_address: 172.20.46.4
-      subnet_45:
-        ipv4_address: 172.20.45.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.45.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router46:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router45, 172.20.45.3, 1],[router47, 172.20.47.3, 1]
-    - my_ip=172.20.46.3
-    - my_name=router46
-    networks:
-      subnet_45:
-        ipv4_address: 172.20.45.2
-      subnet_47:
-        ipv4_address: 172.20.47.4
-      subnet_46:
-        ipv4_address: 172.20.46.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.46.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router47:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router46, 172.20.46.3, 1],[router48, 172.20.48.3, 1]
-    - my_ip=172.20.47.3
-    - my_name=router47
-    networks:
-      subnet_46:
-        ipv4_address: 172.20.46.2
-      subnet_48:
-        ipv4_address: 172.20.48.4
-      subnet_47:
-        ipv4_address: 172.20.47.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.47.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router48:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router47, 172.20.47.3, 1],[router49, 172.20.49.3, 1]
-    - my_ip=172.20.48.3
-    - my_name=router48
-    networks:
-      subnet_47:
-        ipv4_address: 172.20.47.2
-      subnet_49:
-        ipv4_address: 172.20.49.4
-      subnet_48:
-        ipv4_address: 172.20.48.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.48.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router49:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router48, 172.20.48.3, 1],[router50, 172.20.50.3, 1]
-    - my_ip=172.20.49.3
-    - my_name=router49
-    networks:
-      subnet_48:
-        ipv4_address: 172.20.48.2
-      subnet_50:
-        ipv4_address: 172.20.50.4
-      subnet_49:
-        ipv4_address: 172.20.49.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.49.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router50:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router49, 172.20.49.3, 1],[router51, 172.20.51.3, 1]
-    - my_ip=172.20.50.3
-    - my_name=router50
-    networks:
-      subnet_49:
-        ipv4_address: 172.20.49.2
-      subnet_51:
-        ipv4_address: 172.20.51.4
-      subnet_50:
-        ipv4_address: 172.20.50.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.50.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router51:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router50, 172.20.50.3, 1],[router52, 172.20.52.3, 1]
-    - my_ip=172.20.51.3
-    - my_name=router51
-    networks:
-      subnet_50:
-        ipv4_address: 172.20.50.2
-      subnet_52:
-        ipv4_address: 172.20.52.4
-      subnet_51:
-        ipv4_address: 172.20.51.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.51.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router52:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router51, 172.20.51.3, 1],[router53, 172.20.53.3, 1]
-    - my_ip=172.20.52.3
-    - my_name=router52
-    networks:
-      subnet_51:
-        ipv4_address: 172.20.51.2
-      subnet_53:
-        ipv4_address: 172.20.53.4
-      subnet_52:
-        ipv4_address: 172.20.52.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.52.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router53:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router52, 172.20.52.3, 1],[router54, 172.20.54.3, 1]
-    - my_ip=172.20.53.3
-    - my_name=router53
-    networks:
-      subnet_52:
-        ipv4_address: 172.20.52.2
-      subnet_54:
-        ipv4_address: 172.20.54.4
-      subnet_53:
-        ipv4_address: 172.20.53.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.53.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router54:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router53, 172.20.53.3, 1],[router55, 172.20.55.3, 1]
-    - my_ip=172.20.54.3
-    - my_name=router54
-    networks:
-      subnet_53:
-        ipv4_address: 172.20.53.2
-      subnet_55:
-        ipv4_address: 172.20.55.4
-      subnet_54:
-        ipv4_address: 172.20.54.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.54.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router55:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router54, 172.20.54.3, 1],[router56, 172.20.56.3, 1]
-    - my_ip=172.20.55.3
-    - my_name=router55
-    networks:
-      subnet_54:
-        ipv4_address: 172.20.54.2
-      subnet_56:
-        ipv4_address: 172.20.56.4
-      subnet_55:
-        ipv4_address: 172.20.55.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.55.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router56:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router55, 172.20.55.3, 1],[router57, 172.20.57.3, 1]
-    - my_ip=172.20.56.3
-    - my_name=router56
-    networks:
-      subnet_55:
-        ipv4_address: 172.20.55.2
-      subnet_57:
-        ipv4_address: 172.20.57.4
-      subnet_56:
-        ipv4_address: 172.20.56.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.56.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router57:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router56, 172.20.56.3, 1],[router58, 172.20.58.3, 1]
-    - my_ip=172.20.57.3
-    - my_name=router57
-    networks:
-      subnet_56:
-        ipv4_address: 172.20.56.2
-      subnet_58:
-        ipv4_address: 172.20.58.4
-      subnet_57:
-        ipv4_address: 172.20.57.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.57.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router58:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router57, 172.20.57.3, 1],[router59, 172.20.59.3, 1]
-    - my_ip=172.20.58.3
-    - my_name=router58
-    networks:
-      subnet_57:
-        ipv4_address: 172.20.57.2
-      subnet_59:
-        ipv4_address: 172.20.59.4
-      subnet_58:
-        ipv4_address: 172.20.58.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.58.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router59:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router58, 172.20.58.3, 1],[router60, 172.20.60.3, 1]
-    - my_ip=172.20.59.3
-    - my_name=router59
-    networks:
-      subnet_58:
-        ipv4_address: 172.20.58.2
-      subnet_60:
-        ipv4_address: 172.20.60.4
-      subnet_59:
-        ipv4_address: 172.20.59.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.59.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router60:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router59, 172.20.59.3, 1],[router61, 172.20.61.3, 1]
-    - my_ip=172.20.60.3
-    - my_name=router60
-    networks:
-      subnet_59:
-        ipv4_address: 172.20.59.2
-      subnet_61:
-        ipv4_address: 172.20.61.4
-      subnet_60:
-        ipv4_address: 172.20.60.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.60.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router61:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router60, 172.20.60.3, 1],[router62, 172.20.62.3, 1]
-    - my_ip=172.20.61.3
-    - my_name=router61
-    networks:
-      subnet_60:
-        ipv4_address: 172.20.60.2
-      subnet_62:
-        ipv4_address: 172.20.62.4
-      subnet_61:
-        ipv4_address: 172.20.61.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.61.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router62:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router61, 172.20.61.3, 1],[router63, 172.20.63.3, 1]
-    - my_ip=172.20.62.3
-    - my_name=router62
-    networks:
-      subnet_61:
-        ipv4_address: 172.20.61.2
-      subnet_63:
-        ipv4_address: 172.20.63.4
-      subnet_62:
-        ipv4_address: 172.20.62.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.62.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router63:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router62, 172.20.62.3, 1],[router64, 172.20.64.3, 1]
-    - my_ip=172.20.63.3
-    - my_name=router63
-    networks:
-      subnet_62:
-        ipv4_address: 172.20.62.2
-      subnet_64:
-        ipv4_address: 172.20.64.4
-      subnet_63:
-        ipv4_address: 172.20.63.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.63.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router64:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router63, 172.20.63.3, 1],[router65, 172.20.65.3, 1]
-    - my_ip=172.20.64.3
-    - my_name=router64
-    networks:
-      subnet_63:
-        ipv4_address: 172.20.63.2
-      subnet_65:
-        ipv4_address: 172.20.65.4
-      subnet_64:
-        ipv4_address: 172.20.64.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.64.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router65:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router64, 172.20.64.3, 1],[router66, 172.20.66.3, 1]
-    - my_ip=172.20.65.3
-    - my_name=router65
-    networks:
-      subnet_64:
-        ipv4_address: 172.20.64.2
-      subnet_66:
-        ipv4_address: 172.20.66.4
-      subnet_65:
-        ipv4_address: 172.20.65.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.65.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router66:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router65, 172.20.65.3, 1],[router67, 172.20.67.3, 1]
-    - my_ip=172.20.66.3
-    - my_name=router66
-    networks:
-      subnet_65:
-        ipv4_address: 172.20.65.2
-      subnet_67:
-        ipv4_address: 172.20.67.4
-      subnet_66:
-        ipv4_address: 172.20.66.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.66.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router67:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router66, 172.20.66.3, 1],[router68, 172.20.68.3, 1]
-    - my_ip=172.20.67.3
-    - my_name=router67
-    networks:
-      subnet_66:
-        ipv4_address: 172.20.66.2
-      subnet_68:
-        ipv4_address: 172.20.68.4
-      subnet_67:
-        ipv4_address: 172.20.67.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.67.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router68:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router67, 172.20.67.3, 1],[router69, 172.20.69.3, 1]
-    - my_ip=172.20.68.3
-    - my_name=router68
-    networks:
-      subnet_67:
-        ipv4_address: 172.20.67.2
-      subnet_69:
-        ipv4_address: 172.20.69.4
-      subnet_68:
-        ipv4_address: 172.20.68.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.68.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router69:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router68, 172.20.68.3, 1],[router70, 172.20.70.3, 1]
-    - my_ip=172.20.69.3
-    - my_name=router69
-    networks:
-      subnet_68:
-        ipv4_address: 172.20.68.2
-      subnet_70:
-        ipv4_address: 172.20.70.4
-      subnet_69:
-        ipv4_address: 172.20.69.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.69.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router70:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router69, 172.20.69.3, 1],[router71, 172.20.71.3, 1]
-    - my_ip=172.20.70.3
-    - my_name=router70
-    networks:
-      subnet_69:
-        ipv4_address: 172.20.69.2
-      subnet_71:
-        ipv4_address: 172.20.71.4
-      subnet_70:
-        ipv4_address: 172.20.70.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.70.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router71:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router70, 172.20.70.3, 1],[router72, 172.20.72.3, 1]
-    - my_ip=172.20.71.3
-    - my_name=router71
-    networks:
-      subnet_70:
-        ipv4_address: 172.20.70.2
-      subnet_72:
-        ipv4_address: 172.20.72.4
-      subnet_71:
-        ipv4_address: 172.20.71.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.71.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router72:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router71, 172.20.71.3, 1],[router73, 172.20.73.3, 1]
-    - my_ip=172.20.72.3
-    - my_name=router72
-    networks:
-      subnet_71:
-        ipv4_address: 172.20.71.2
-      subnet_73:
-        ipv4_address: 172.20.73.4
-      subnet_72:
-        ipv4_address: 172.20.72.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.72.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router73:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router72, 172.20.72.3, 1],[router74, 172.20.74.3, 1]
-    - my_ip=172.20.73.3
-    - my_name=router73
-    networks:
-      subnet_72:
-        ipv4_address: 172.20.72.2
-      subnet_74:
-        ipv4_address: 172.20.74.4
-      subnet_73:
-        ipv4_address: 172.20.73.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.73.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router74:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router73, 172.20.73.3, 1],[router75, 172.20.75.3, 1]
-    - my_ip=172.20.74.3
-    - my_name=router74
-    networks:
-      subnet_73:
-        ipv4_address: 172.20.73.2
-      subnet_75:
-        ipv4_address: 172.20.75.4
-      subnet_74:
-        ipv4_address: 172.20.74.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.74.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router75:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router74, 172.20.74.3, 1],[router76, 172.20.76.3, 1]
-    - my_ip=172.20.75.3
-    - my_name=router75
-    networks:
-      subnet_74:
-        ipv4_address: 172.20.74.2
-      subnet_76:
-        ipv4_address: 172.20.76.4
-      subnet_75:
-        ipv4_address: 172.20.75.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.75.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router76:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router75, 172.20.75.3, 1],[router77, 172.20.77.3, 1]
-    - my_ip=172.20.76.3
-    - my_name=router76
-    networks:
-      subnet_75:
-        ipv4_address: 172.20.75.2
-      subnet_77:
-        ipv4_address: 172.20.77.4
-      subnet_76:
-        ipv4_address: 172.20.76.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.76.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router77:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router76, 172.20.76.3, 1],[router78, 172.20.78.3, 1]
-    - my_ip=172.20.77.3
-    - my_name=router77
-    networks:
-      subnet_76:
-        ipv4_address: 172.20.76.2
-      subnet_78:
-        ipv4_address: 172.20.78.4
-      subnet_77:
-        ipv4_address: 172.20.77.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.77.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router78:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router77, 172.20.77.3, 1],[router79, 172.20.79.3, 1]
-    - my_ip=172.20.78.3
-    - my_name=router78
-    networks:
-      subnet_77:
-        ipv4_address: 172.20.77.2
-      subnet_79:
-        ipv4_address: 172.20.79.4
-      subnet_78:
-        ipv4_address: 172.20.78.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.78.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router79:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router78, 172.20.78.3, 1],[router80, 172.20.80.3, 1]
-    - my_ip=172.20.79.3
-    - my_name=router79
-    networks:
-      subnet_78:
-        ipv4_address: 172.20.78.2
-      subnet_80:
-        ipv4_address: 172.20.80.4
-      subnet_79:
-        ipv4_address: 172.20.79.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.79.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router80:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router79, 172.20.79.3, 1],[router81, 172.20.81.3, 1]
-    - my_ip=172.20.80.3
-    - my_name=router80
-    networks:
-      subnet_79:
-        ipv4_address: 172.20.79.2
-      subnet_81:
-        ipv4_address: 172.20.81.4
-      subnet_80:
-        ipv4_address: 172.20.80.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.80.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router81:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router80, 172.20.80.3, 1],[router82, 172.20.82.3, 1]
-    - my_ip=172.20.81.3
-    - my_name=router81
-    networks:
-      subnet_80:
-        ipv4_address: 172.20.80.2
-      subnet_82:
-        ipv4_address: 172.20.82.4
-      subnet_81:
-        ipv4_address: 172.20.81.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.81.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router82:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router81, 172.20.81.3, 1],[router83, 172.20.83.3, 1]
-    - my_ip=172.20.82.3
-    - my_name=router82
-    networks:
-      subnet_81:
-        ipv4_address: 172.20.81.2
-      subnet_83:
-        ipv4_address: 172.20.83.4
-      subnet_82:
-        ipv4_address: 172.20.82.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.82.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router83:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router82, 172.20.82.3, 1],[router84, 172.20.84.3, 1]
-    - my_ip=172.20.83.3
-    - my_name=router83
-    networks:
-      subnet_82:
-        ipv4_address: 172.20.82.2
-      subnet_84:
-        ipv4_address: 172.20.84.4
-      subnet_83:
-        ipv4_address: 172.20.83.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.83.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router84:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router83, 172.20.83.3, 1],[router85, 172.20.85.3, 1]
-    - my_ip=172.20.84.3
-    - my_name=router84
-    networks:
-      subnet_83:
-        ipv4_address: 172.20.83.2
-      subnet_85:
-        ipv4_address: 172.20.85.4
-      subnet_84:
-        ipv4_address: 172.20.84.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.84.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router85:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router84, 172.20.84.3, 1],[router86, 172.20.86.3, 1]
-    - my_ip=172.20.85.3
-    - my_name=router85
-    networks:
-      subnet_84:
-        ipv4_address: 172.20.84.2
-      subnet_86:
-        ipv4_address: 172.20.86.4
-      subnet_85:
-        ipv4_address: 172.20.85.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.85.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router86:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router85, 172.20.85.3, 1],[router87, 172.20.87.3, 1]
-    - my_ip=172.20.86.3
-    - my_name=router86
-    networks:
-      subnet_85:
-        ipv4_address: 172.20.85.2
-      subnet_87:
-        ipv4_address: 172.20.87.4
-      subnet_86:
-        ipv4_address: 172.20.86.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.86.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router87:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router86, 172.20.86.3, 1],[router88, 172.20.88.3, 1]
-    - my_ip=172.20.87.3
-    - my_name=router87
-    networks:
-      subnet_86:
-        ipv4_address: 172.20.86.2
-      subnet_88:
-        ipv4_address: 172.20.88.4
-      subnet_87:
-        ipv4_address: 172.20.87.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.87.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router88:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router87, 172.20.87.3, 1],[router89, 172.20.89.3, 1]
-    - my_ip=172.20.88.3
-    - my_name=router88
-    networks:
-      subnet_87:
-        ipv4_address: 172.20.87.2
-      subnet_89:
-        ipv4_address: 172.20.89.4
-      subnet_88:
-        ipv4_address: 172.20.88.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.88.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router89:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router88, 172.20.88.3, 1],[router90, 172.20.90.3, 1]
-    - my_ip=172.20.89.3
-    - my_name=router89
-    networks:
-      subnet_88:
-        ipv4_address: 172.20.88.2
-      subnet_90:
-        ipv4_address: 172.20.90.4
-      subnet_89:
-        ipv4_address: 172.20.89.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.89.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router90:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router89, 172.20.89.3, 1],[router91, 172.20.91.3, 1]
-    - my_ip=172.20.90.3
-    - my_name=router90
-    networks:
-      subnet_89:
-        ipv4_address: 172.20.89.2
-      subnet_91:
-        ipv4_address: 172.20.91.4
-      subnet_90:
-        ipv4_address: 172.20.90.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.90.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router91:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router90, 172.20.90.3, 1],[router92, 172.20.92.3, 1]
-    - my_ip=172.20.91.3
-    - my_name=router91
-    networks:
-      subnet_90:
-        ipv4_address: 172.20.90.2
-      subnet_92:
-        ipv4_address: 172.20.92.4
-      subnet_91:
-        ipv4_address: 172.20.91.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.91.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router92:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router91, 172.20.91.3, 1],[router93, 172.20.93.3, 1]
-    - my_ip=172.20.92.3
-    - my_name=router92
-    networks:
-      subnet_91:
-        ipv4_address: 172.20.91.2
-      subnet_93:
-        ipv4_address: 172.20.93.4
-      subnet_92:
-        ipv4_address: 172.20.92.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.92.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router93:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router92, 172.20.92.3, 1],[router94, 172.20.94.3, 1]
-    - my_ip=172.20.93.3
-    - my_name=router93
-    networks:
-      subnet_92:
-        ipv4_address: 172.20.92.2
-      subnet_94:
-        ipv4_address: 172.20.94.4
-      subnet_93:
-        ipv4_address: 172.20.93.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.93.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router94:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router93, 172.20.93.3, 1],[router95, 172.20.95.3, 1]
-    - my_ip=172.20.94.3
-    - my_name=router94
-    networks:
-      subnet_93:
-        ipv4_address: 172.20.93.2
-      subnet_95:
-        ipv4_address: 172.20.95.4
-      subnet_94:
-        ipv4_address: 172.20.94.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.94.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router95:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router94, 172.20.94.3, 1],[router96, 172.20.96.3, 1]
-    - my_ip=172.20.95.3
-    - my_name=router95
-    networks:
-      subnet_94:
-        ipv4_address: 172.20.94.2
-      subnet_96:
-        ipv4_address: 172.20.96.4
-      subnet_95:
-        ipv4_address: 172.20.95.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.95.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router96:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router95, 172.20.95.3, 1],[router97, 172.20.97.3, 1]
-    - my_ip=172.20.96.3
-    - my_name=router96
-    networks:
-      subnet_95:
-        ipv4_address: 172.20.95.2
-      subnet_97:
-        ipv4_address: 172.20.97.4
-      subnet_96:
-        ipv4_address: 172.20.96.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.96.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router97:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router96, 172.20.96.3, 1],[router98, 172.20.98.3, 1]
-    - my_ip=172.20.97.3
-    - my_name=router97
-    networks:
-      subnet_96:
-        ipv4_address: 172.20.96.2
-      subnet_98:
-        ipv4_address: 172.20.98.4
-      subnet_97:
-        ipv4_address: 172.20.97.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.97.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router98:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router97, 172.20.97.3, 1],[router99, 172.20.99.3, 1]
-    - my_ip=172.20.98.3
-    - my_name=router98
-    networks:
-      subnet_97:
-        ipv4_address: 172.20.97.2
-      subnet_99:
-        ipv4_address: 172.20.99.4
-      subnet_98:
-        ipv4_address: 172.20.98.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.98.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router99:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router98, 172.20.98.3, 1],[router100, 172.20.100.3, 1]
-    - my_ip=172.20.99.3
-    - my_name=router99
-    networks:
-      subnet_98:
-        ipv4_address: 172.20.98.2
-      subnet_100:
-        ipv4_address: 172.20.100.4
-      subnet_99:
-        ipv4_address: 172.20.99.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.99.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
-  router100:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    volumes:
-    - ./router:/app
-    environment:
-    - vizinhos=[router1, 172.20.1.3, 1],[router99, 172.20.99.3, 1]
-    - my_ip=172.20.100.3
-    - my_name=router100
-    networks:
-      subnet_1:
-        ipv4_address: 172.20.1.4
-      subnet_99:
-        ipv4_address: 172.20.99.2
-      subnet_100:
-        ipv4_address: 172.20.100.3
-    cap_add:
-    - NET_ADMIN
-    command: /bin/bash -c "ip route del default && ip route add default via 172.20.100.3
-      && python router.py"
-    cpus: '0.09600000000000002'
-    mem_limit: 121M
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
 networks:
   subnet_1:
     driver: bridge
@@ -2360,543 +590,3 @@ networks:
       config:
       - subnet: 172.20.10.0/24
         gateway: 172.20.10.1
-  subnet_11:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.11.0/24
-        gateway: 172.20.11.1
-  subnet_12:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.12.0/24
-        gateway: 172.20.12.1
-  subnet_13:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.13.0/24
-        gateway: 172.20.13.1
-  subnet_14:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.14.0/24
-        gateway: 172.20.14.1
-  subnet_15:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.15.0/24
-        gateway: 172.20.15.1
-  subnet_16:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.16.0/24
-        gateway: 172.20.16.1
-  subnet_17:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.17.0/24
-        gateway: 172.20.17.1
-  subnet_18:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.18.0/24
-        gateway: 172.20.18.1
-  subnet_19:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.19.0/24
-        gateway: 172.20.19.1
-  subnet_20:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.20.0/24
-        gateway: 172.20.20.1
-  subnet_21:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.21.0/24
-        gateway: 172.20.21.1
-  subnet_22:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.22.0/24
-        gateway: 172.20.22.1
-  subnet_23:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.23.0/24
-        gateway: 172.20.23.1
-  subnet_24:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.24.0/24
-        gateway: 172.20.24.1
-  subnet_25:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.25.0/24
-        gateway: 172.20.25.1
-  subnet_26:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.26.0/24
-        gateway: 172.20.26.1
-  subnet_27:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.27.0/24
-        gateway: 172.20.27.1
-  subnet_28:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.28.0/24
-        gateway: 172.20.28.1
-  subnet_29:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.29.0/24
-        gateway: 172.20.29.1
-  subnet_30:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.30.0/24
-        gateway: 172.20.30.1
-  subnet_31:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.31.0/24
-        gateway: 172.20.31.1
-  subnet_32:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.32.0/24
-        gateway: 172.20.32.1
-  subnet_33:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.33.0/24
-        gateway: 172.20.33.1
-  subnet_34:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.34.0/24
-        gateway: 172.20.34.1
-  subnet_35:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.35.0/24
-        gateway: 172.20.35.1
-  subnet_36:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.36.0/24
-        gateway: 172.20.36.1
-  subnet_37:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.37.0/24
-        gateway: 172.20.37.1
-  subnet_38:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.38.0/24
-        gateway: 172.20.38.1
-  subnet_39:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.39.0/24
-        gateway: 172.20.39.1
-  subnet_40:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.40.0/24
-        gateway: 172.20.40.1
-  subnet_41:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.41.0/24
-        gateway: 172.20.41.1
-  subnet_42:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.42.0/24
-        gateway: 172.20.42.1
-  subnet_43:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.43.0/24
-        gateway: 172.20.43.1
-  subnet_44:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.44.0/24
-        gateway: 172.20.44.1
-  subnet_45:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.45.0/24
-        gateway: 172.20.45.1
-  subnet_46:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.46.0/24
-        gateway: 172.20.46.1
-  subnet_47:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.47.0/24
-        gateway: 172.20.47.1
-  subnet_48:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.48.0/24
-        gateway: 172.20.48.1
-  subnet_49:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.49.0/24
-        gateway: 172.20.49.1
-  subnet_50:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.50.0/24
-        gateway: 172.20.50.1
-  subnet_51:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.51.0/24
-        gateway: 172.20.51.1
-  subnet_52:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.52.0/24
-        gateway: 172.20.52.1
-  subnet_53:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.53.0/24
-        gateway: 172.20.53.1
-  subnet_54:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.54.0/24
-        gateway: 172.20.54.1
-  subnet_55:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.55.0/24
-        gateway: 172.20.55.1
-  subnet_56:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.56.0/24
-        gateway: 172.20.56.1
-  subnet_57:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.57.0/24
-        gateway: 172.20.57.1
-  subnet_58:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.58.0/24
-        gateway: 172.20.58.1
-  subnet_59:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.59.0/24
-        gateway: 172.20.59.1
-  subnet_60:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.60.0/24
-        gateway: 172.20.60.1
-  subnet_61:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.61.0/24
-        gateway: 172.20.61.1
-  subnet_62:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.62.0/24
-        gateway: 172.20.62.1
-  subnet_63:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.63.0/24
-        gateway: 172.20.63.1
-  subnet_64:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.64.0/24
-        gateway: 172.20.64.1
-  subnet_65:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.65.0/24
-        gateway: 172.20.65.1
-  subnet_66:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.66.0/24
-        gateway: 172.20.66.1
-  subnet_67:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.67.0/24
-        gateway: 172.20.67.1
-  subnet_68:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.68.0/24
-        gateway: 172.20.68.1
-  subnet_69:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.69.0/24
-        gateway: 172.20.69.1
-  subnet_70:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.70.0/24
-        gateway: 172.20.70.1
-  subnet_71:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.71.0/24
-        gateway: 172.20.71.1
-  subnet_72:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.72.0/24
-        gateway: 172.20.72.1
-  subnet_73:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.73.0/24
-        gateway: 172.20.73.1
-  subnet_74:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.74.0/24
-        gateway: 172.20.74.1
-  subnet_75:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.75.0/24
-        gateway: 172.20.75.1
-  subnet_76:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.76.0/24
-        gateway: 172.20.76.1
-  subnet_77:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.77.0/24
-        gateway: 172.20.77.1
-  subnet_78:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.78.0/24
-        gateway: 172.20.78.1
-  subnet_79:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.79.0/24
-        gateway: 172.20.79.1
-  subnet_80:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.80.0/24
-        gateway: 172.20.80.1
-  subnet_81:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.81.0/24
-        gateway: 172.20.81.1
-  subnet_82:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.82.0/24
-        gateway: 172.20.82.1
-  subnet_83:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.83.0/24
-        gateway: 172.20.83.1
-  subnet_84:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.84.0/24
-        gateway: 172.20.84.1
-  subnet_85:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.85.0/24
-        gateway: 172.20.85.1
-  subnet_86:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.86.0/24
-        gateway: 172.20.86.1
-  subnet_87:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.87.0/24
-        gateway: 172.20.87.1
-  subnet_88:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.88.0/24
-        gateway: 172.20.88.1
-  subnet_89:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.89.0/24
-        gateway: 172.20.89.1
-  subnet_90:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.90.0/24
-        gateway: 172.20.90.1
-  subnet_91:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.91.0/24
-        gateway: 172.20.91.1
-  subnet_92:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.92.0/24
-        gateway: 172.20.92.1
-  subnet_93:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.93.0/24
-        gateway: 172.20.93.1
-  subnet_94:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.94.0/24
-        gateway: 172.20.94.1
-  subnet_95:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.95.0/24
-        gateway: 172.20.95.1
-  subnet_96:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.96.0/24
-        gateway: 172.20.96.1
-  subnet_97:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.97.0/24
-        gateway: 172.20.97.1
-  subnet_98:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.98.0/24
-        gateway: 172.20.98.1
-  subnet_99:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.99.0/24
-        gateway: 172.20.99.1
-  subnet_100:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.100.0/24
-        gateway: 172.20.100.1

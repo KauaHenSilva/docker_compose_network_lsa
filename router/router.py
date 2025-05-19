@@ -356,7 +356,7 @@ class Router:
         Logger.log(f"Roteador inicializado com Nome: {ROTEADOR_IP}")
         Logger.log(f"Vizinhos configurados: {VIZINHOS}")
     
-    def comparar_vizinhos(self, vizinhos_antigos: Dict[str, Tuple[str, int]], vizinhos_ativos: Dict[str, Tuple[str, int]]) -> True:
+    def comparar_vizinhos(self, vizinhos_antigos: Dict[str, Tuple[str, int]], vizinhos_ativos: Dict[str, Tuple[str, int]]) -> bool:
         """
         Compara os vizinhos ativos com os antigos e retorna True se houver diferença.
         
@@ -450,6 +450,9 @@ class Router:
         threading.Event().wait()
 
 if __name__ == "__main__":
+    os.makedirs("lsdb", exist_ok=True)
+    os.makedirs("rotas", exist_ok=True)
+    
     # Inicializa e executa o roteador
     router = Router()
     router.iniciar()
