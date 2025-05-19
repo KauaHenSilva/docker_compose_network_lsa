@@ -111,7 +111,7 @@ prova_1_rayner/
    python3 docker_compose_ger_cir.py
    ```
    
-   Quando solicitado, insira o número de subredes (recomendado: entre 3 e 10).
+   Quando solicitado, insira o número de subredes.
 
 3. **Inicie os containers**:
    ```bash
@@ -242,7 +242,6 @@ Cada roteador implementa o algoritmo de estado de enlace com as seguintes caract
 2. **Threads de Comunicação**:
    - Thread de recebimento: Escuta continuamente por pacotes de estado de enlace
    - Thread de transmissão: Envia periodicamente o estado atual do roteador
-   - Thread de processamento: Executa o algoritmo de Dijkstra quando a LSDB é atualizada
 
 3. **Algoritmo de Dijkstra**:
    - Calcula o caminho mais curto para todos os destinos
@@ -254,24 +253,4 @@ Cada roteador implementa o algoritmo de estado de enlace com as seguintes caract
    - Adiciona ou atualiza rotas conforme necessário
    - Remove rotas obsoletas
 
-## Limiares de Stress e Performance
-
-O sistema foi testado com diferentes configurações de rede:
-
-- **Número de roteadores**: Testado com 3, 5, 10 e 20 roteadores
-- **Frequência de atualização**: Testado com intervalos de 1, 5 e 10 segundos
-- **Tamanho da rede**: Testado com diferentes densidades de conexão
-
-Resultados de performance:
-- O sistema mantém estabilidade com até 20 roteadores
-- A convergência da rede ocorre em menos de 30 segundos para redes pequenas (5 roteadores)
-- Para redes maiores (10-20 roteadores), a convergência pode levar até 1 minuto no máximo.
-- O uso de CPU permanece em 100% mesmo com 10, 15 e 20 roteadores.
-
-## Vantagens da Abordagem
-
-1. **Escalabilidade**: A arquitetura permite adicionar facilmente novos roteadores e hosts
-2. **Flexibilidade**: A topologia pode ser facilmente modificada alterando os parâmetros do gerador
-3. **Visualização**: Scripts de teste facilitam a visualização do estado da rede
-4. **Automação**: O Makefile simplifica a execução de comandos comuns
 
