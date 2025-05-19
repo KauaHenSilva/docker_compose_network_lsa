@@ -230,6 +230,84 @@ Cada topologia tem características específicas:
 - **Fila**: Cada roteador se conecta apenas aos adjacentes, formando uma linha
 - **Anel**: Similar à fila, mas o último roteador conecta-se ao primeiro, fechando um círculo
 
+### Exemplo de Configuração
+
+O exemplo abaixo ilustra como o arquivo é configurado as sub-redes. 
+
+#### Networks
+
+- "network":
+  - Define a rede virtual para os containers
+  - Cada sub-rede tem um driver de ponte e configurações de IPAM (IP Address Management)
+- "subnet":
+  - Define o intervalo de endereços IP para a sub-rede
+  - Define o gateway para a sub-rede
+- "driver":
+  - Define o driver de rede a ser utilizado (neste caso, `bridge`). resumindo: Usa o driver de ponte para criar uma rede virtual isolada para os containers.
+
+```yaml
+networks:
+  subnet_1:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.1.0/24
+        gateway: 172.20.1.1
+  subnet_2:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.20.2.0/24
+        gateway: 172.20.2.1
+   ...
+```
+
+#### Router
+
+- "build":
+  - Define o contexto e o Dockerfile para construir a imagem do roteador Nosso caso, o diretório `./router` contém o código do roteador e o Dockerfile.
+- "volumes":
+  - Monta o diretório local `./router` no container, permitindo acesso ao código-fonte.
+- "environment":
+   - Define variáveis de ambiente para o roteador, como vizinhos, IP e nome.
+- "networks":
+   - Define as redes às quais o roteador pertence, com endereços IP específicos para cada sub-rede.
+   - "ipv4_address":
+     - Define o endereço IP do roteador em cada sub-rede. Nesse caso, o roteador `router1` tem IPs em três sub-redes diferentes. Aqueles que termina com .2 são interfaces das sub-redes anteriores, enquanto os que terminam com .3 são a interface do roteador. e os que terminam com .4 são os das interfaces das sub-redes posteriores.
+- "cap_add":
+   - Adiciona capacidades específicas ao container, como `NET_ADMIN`, permitindo manipulação de rotas.
+- "command":
+   - Define o comando a ser executado quando o container inicia. Neste caso, remove a rota padrão e adiciona uma nova rota padrão antes de iniciar o script do roteador.
+- "cpus":
+   - Limita o uso de CPU do container. Neste caso, a soma de todos os containers estão limitados a 80% CPUs. 
+
+```yaml
+  router1:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    volumes:
+    - ./router:/app
+    environment:
+    - vizinhos=[router10, 172.20.10.3, 1],[router2, 172.20.2.3, 1]
+    - my_ip=172.20.1.3
+    - my_name=router1
+    networks:
+      subnet_10:
+        ipv4_address: 172.20.10.2
+      subnet_2:
+        ipv4_address: 172.20.2.4
+      subnet_1:
+        ipv4_address: 172.20.1.3
+    cap_add:
+    - NET_ADMIN
+    command: /bin/bash -c "ip route del default && ip route add default via 172.20.1.3
+      && python router.py"
+    cpus: '0.32000000000000006'
+    mem_limit: 405M
+```
+
+
 ## Implementação do Algoritmo de Estado de Enlace
 
 Cada roteador implementa o algoritmo de estado de enlace com as seguintes características:
